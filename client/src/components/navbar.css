@@ -1,0 +1,126 @@
+/* navbar.css */
+
+/* Resets to ensure consistent styling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #002b7f; 
+  color: white;
+  padding: 1em 0.5em;
+}
+
+.nav-section {
+  display: flex;
+  align-items: center;
+  /* Added to ensure the left section aligns to the left */
+  justify-content: flex-start; 
+}
+
+.nav-section.left {
+  flex: 1; /* Allows the left section to take up available space */
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 0.25em 0;
+  margin: 0 1em;
+  position: relative;
+}
+
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  background: #f9a01b;
+  height: 2px;
+  transition: left 0.3s ease, right 0.3s ease;
+}
+.nav-link.active:not(.app-name)::after {
+  content: '';
+  position: absolute;
+  left: 0; /* Extend the underline across the entire element */
+  right: 0; /* Extend the underline across the entire element */
+  bottom: 0;
+  background: #f9a01b; /* Orange color for the underline */
+  height: 2px; /* Thickness of the underline */
+  transition: left 0.3s ease, right 0.3s ease;
+}
+
+.nav-link:hover::after {
+  left: 0;
+  right: 0;
+}
+
+.app-name {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.nav-toggle {
+  display: none; /* Hide the toggle button by default */
+}
+
+.right {
+  justify-content: flex-end;
+}
+
+.mobile-profile-link {
+  display: none;
+}
+
+/* Mobile view */
+
+@media (max-width: 768px) {
+  .nav-section.right .profile-link {
+    display: none; /* Hide the original profile link on mobile */
+}
+
+.mobile-profile-link {
+    display: block; /* Show the profile link in the dropdown on mobile */
+}
+  .nav-section.left {
+    justify-content: flex-start;
+  }
+  .nav-menu {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-menu.show {
+    /* Adjust padding and margin as necessary here */
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align to the right side */
+  }
+  
+
+  .nav-toggle {
+    display:contents;
+    font-size: 1.75em;
+    cursor: pointer;
+    color: white;
+    justify-content: flex-end;
+  
+  }
+
+  .nav-section.right {
+    display: none; /* Hide right section links on mobile */
+  }
+  .nav-menu.show .nav-link {
+    padding: 10px 20px; /* Adjust the top/bottom and left/right padding as needed */
+  }
+}
+

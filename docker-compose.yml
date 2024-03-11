@@ -8,9 +8,7 @@ services:
       - '3000:3000'
     volumes:
       - ./client:/app
-      - node-modules-volume-react:/app/node_modules # this mount keeps node_modules from getting wiped when we mount the container
-    # environment:
-    #   REACT_APP_HOST: '{"APP_URL":"http://localhost:3000"}'
+      - node-modules-volume-react:/app/node_modules 
     stdin_open: true
     tty: true
 
@@ -33,7 +31,7 @@ services:
     command: npm start
     build: ./server
     container_name: mongo-express
-    # restart: always
+    restart: always
     ports:
       - 8081:8081
     environment:
@@ -43,7 +41,7 @@ services:
 
     volumes:
       - ./server:/app
-      - node-modules-volume-express:/app/node_modules # this mount keeps node_modules from getting wiped when we mount the container
+      - node-modules-volume-express:/app/node_modules 
 volumes:
   node-modules-volume-react:
   node-modules-volume-express:
