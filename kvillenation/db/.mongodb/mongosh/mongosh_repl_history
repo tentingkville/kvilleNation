@@ -1,0 +1,11 @@
+);
+}
+]
+      { role: "readWrite", db: "development" }
+      { role: "dbOwner", db: "development" },
+roles: [
+pwd: "password",
+user: "root",
+{
+db.createUser(
+use development
