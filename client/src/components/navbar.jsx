@@ -8,7 +8,7 @@ export default function Navbar() {
 
     return (
         <nav className='nav'>
-            <NavLink to="/home" className="nav-link app-name">KvilleNation</NavLink>
+            <NavLink to="/" className="nav-link app-name">KvilleNation</NavLink>
             <div className="nav-section left">
                 <button
                     className="nav-toggle"
