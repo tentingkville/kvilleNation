@@ -57,12 +57,6 @@
       * If empty, create collection "users". If collections exist, click "users"
       * Click "Add Data" --> "Insert Document"
       * Add yourself as an admin user in JSON format (example: {"name": "Your Name", "netid": "abc123", "role": "admin"})
-    * To use seed document(optional)
-      * This will **wipe the current local database**, so don't do this on dev or prod!!!
-      * in the terminal, type `docker-compose exec express bash`
-      * once in the bash shell, type `node seed_db.js`
-      * It will ask for your name, netid and number of fake employees
-      * This seed file will generate some schedules and shifts for you
     
   * Restart Docker 
     * Close out of Compass
