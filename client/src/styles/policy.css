@@ -2,13 +2,14 @@
     width: 100%; /* Full width to center the bubble within */
     text-align: center; /* Center the inner content */
     padding-top: 50px;
+    padding-bottom: 50px;
 }
 
 .policy-bubble {
-    display: inline-block; /* Inline-block for horizontal centering */
-    width: 90%; /* Adjust width as needed */
-    height: 800px; /* Adjust height as needed */
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Adds shadow for a bubble effect */
-    border-radius: 15px; /* Round corners for bubble effect */
-    overflow: hidden; /* Ensures the PDF does not overflow the bubble container */
+    display: inline-block; 
+    width: 90%;
+    height: 700px; 
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); 
+    border-radius: 15px; 
+    overflow: hidden; 
 }

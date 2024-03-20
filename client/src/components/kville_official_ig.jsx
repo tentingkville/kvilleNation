@@ -78,4 +78,4 @@ const InstagramEmbedKvilleNation = () => {
   );
 };
 
-export default InstagramEmbed;
+export default InstagramEmbedKvilleNation;
