@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "../styles/home.css";
 import bannerImage from '../images/kvillenationbanner.png';
-import InstagramEmbed from '../components/kville_official_ig.jsx';
+import InstagramEmbedKvilleNation from '../components/kville_official_ig.jsx';
 import InstagramEmbedDukeMBB from '../components/dukembb_ig.jsx';
 import SpotifyEmbed from '../components/spotifyEmbed.jsx';
 
@@ -93,7 +93,7 @@ const Home = () => {
         </div>
         <div className="embeds-row"> 
         <div className="final-home-row">
-          <InstagramEmbed />
+          <InstagramEmbedKvilleNation />
         </div>
         <div className='final-home-row'>
           <InstagramEmbedDukeMBB />

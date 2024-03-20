@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-const InstagramEmbed = () => {
+const InstagramEmbedKvilleNation = () => {
   useEffect(() => {
     const script = document.createElement('script');
     script.async = true;
