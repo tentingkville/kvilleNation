@@ -1,34 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css';
 import policyPdf from '../components/policy.pdf'; // Import the PDF file
 import '../styles/policy.css'; // Import the CSS file
 
 function Policy() {
-    const [pdfLoaded, setPdfLoaded] = useState(false);
-
-    useEffect(() => {
-        const preloadPdf = new Image();
-        preloadPdf.src = policyPdf;
-        preloadPdf.onload = () => setPdfLoaded(true);
-    }, []);
-
     return (
         <div className="policy-container">
-            {pdfLoaded ? (
-                <div className="policy-bubble">
-                    <object
-                        type="application/pdf"
-                        data={policyPdf}
-                        width="100%"
-                        height="100%"
-                    >
-                        <p>Your browser does not support PDFs.
-                            <a href={policyPdf}>Download the PDF</a>.
-                        </p>
-                    </object>
-                </div>
-            ) : (
-                <p>Loading PDF...</p>
-            )}
+            <div className="policy-bubble">
+                <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
+                    <Viewer fileUrl={policyPdf} />
+                </Worker>
+            </div>
         </div>
     );
 }
