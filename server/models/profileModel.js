@@ -12,7 +12,9 @@ const kvilleProfileSchema = new Schema({
     } },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    isLineMonitor: { type: Boolean, required: true },
+    isSuperUser: { type: Boolean, required: true },
 },{ collection: "kvilleProfiles" });
 
 module.exports = mongoose.model('kvilleProfiles', kvilleProfileSchema);

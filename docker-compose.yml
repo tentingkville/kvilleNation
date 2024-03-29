@@ -8,7 +8,7 @@ services:
       - '3000:3000'
     volumes:
       - ./client:/app
-      - node-modules-volume-react:/app/node_modules 
+      - node-modules-volume-react:/app/node_modules
     stdin_open: true
     tty: true
 
@@ -31,17 +31,17 @@ services:
     command: npm start
     build: ./server
     container_name: mongo-express
-    restart: always
+    # restart: always
     ports:
       - 8081:8081
     environment:
       ME_CONFIG_MONGODB_ADMINUSER: root
       ME_CONFIG_MONGODB_ADMINPASS: password
-      ME_CONFIG_MONGODB_SERVER: mongo #container name
+      ME_CONFIG_MONGODB_SERVER: mongo 
 
     volumes:
       - ./server:/app
-      - node-modules-volume-express:/app/node_modules 
+      - node-modules-volume-express:/app/node_modules # this mount keeps node_modules from getting wiped when we mount the container
 volumes:
   node-modules-volume-react:
   node-modules-volume-express:

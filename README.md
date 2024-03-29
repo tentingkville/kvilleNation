@@ -57,6 +57,12 @@
       * If empty, create collection "users". If collections exist, click "users"
       * Click "Add Data" --> "Insert Document"
       * Add yourself as an admin user in JSON format (example: {"name": "Your Name", "netid": "abc123", "role": "admin"})
+    * To use seed document(optional)
+      * This will **wipe the current local database**, so don't do this on dev or prod!!!
+      * in the terminal, type `docker-compose exec express bash`
+      * once in the bash shell, type `node seed_db.js`
+      * It will ask for your name, netid and number of fake employees
+      * This seed file will generate some schedules and shifts for you
     
   * Restart Docker 
     * Close out of Compass
@@ -65,6 +71,7 @@
     * `docker-compose up` -start docker containers again
 
   * Go to localhost:3000 in your browser
+    * If you are working on Windows, and the login page is not working, check Docker to see if shifter_express is running. If not, you may have to run the following command in your terminal `cd express` followed by `sed -i -e 's/\r$//' start_app.sh`.
 
 3. docker-compose commands
   * `docker-compose build` - builds the images. This must be run if we install more npm packages
