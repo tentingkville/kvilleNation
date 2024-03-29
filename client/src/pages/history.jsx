@@ -37,10 +37,11 @@ function History() {
                         its disregard for authority, and its love of Duke basketball.
                     </p>
                     <blockquote>
+                        <p>
                         “[The Bunch of Guys] were the entertainers of the entertainment,” 
                         Krzyzewski wrote in an email. “They were in the middle of everything. 
                         I know they created a lot of angst and were a cause of concern at times,
-                        but overall, they were great.”
+                        but overall, they were great.”</p>
                     </blockquote>
                     <p>
                         Over the years, as the student section at Duke evolved from the Student
@@ -86,13 +87,15 @@ function History() {
                         and her cohorts were not the first to camp out before a game, they were most certainly 
                         first in line for that famous 1986 game - the catalyst that begat the first Krzyzewskiville.
                     </p>
-                    <blockquote>
+                    <blockquote> 
+                        <p>
                         "It was common for people to line up hours before a game," said Kimberly Reed, Trinity 
                         '86, who was one of the first tenters. "We were playing quarters one night at Mirecourt 
                         and joking about how early we were going to line up for the '86 
                         [University of North Carolina at Chapel Hill] game. Finally, someone said, 
                         'Why don't we just pitch a tent?' After a few rounds of quarters, it began to sound 
                         like a good idea."
+                        </p>
                     </blockquote>
                 </div>
             </div>
