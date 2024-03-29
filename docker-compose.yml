@@ -14,7 +14,8 @@ services:
 
   mongo:
     container_name: mongo
-    image: mongo
+    image: arm64v8/mongo
+    platform: linux/arm64/v8
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -23,7 +24,6 @@ services:
       - 27017:27017
     volumes:
      - ./db:/data/db
-
   # mongo-express service
   mongo-express:
     depends_on:
