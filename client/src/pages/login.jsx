@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import  {Alert}  from 'react-bootstrap';
+import Alert from 'react-bootstrap/Alert';
 import '../styles/login.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,20 +14,32 @@ const Login = () => {
     password: '',
     confirmPassword: ''
   });
-  const [alert, setAlert] = useState({ show: false, message: '', type: '' });
+
+  const [successAlert, setSuccessAlert] = useState({ show: false, message: '' });
+  const [errorAlert, setErrorAlert] = useState({ show: false, message: '' });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Display functions for alerts
+  const displaySuccessAlert = (message) => {
+    setSuccessAlert({ show: true, message });
+    setTimeout(() => setSuccessAlert({ show: false, message: '' }), 5000); // Automatically hide after 5 seconds
+  };
+
+  const displayErrorAlert = (message) => {
+    setErrorAlert({ show: true, message });
+    setTimeout(() => setErrorAlert({ show: false, message: '' }), 5000); // Automatically hide after 5 seconds
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const url = `http://localhost:8081/api/profile/${isRegistering ? 'register' : 'login'}`;
     const { netID, email, firstName, lastName, password, confirmPassword } = formData;
 
     if (isRegistering && password !== confirmPassword) {
-      setAlert({ show: true, message: 'Passwords do not match', type: 'danger' });
+      displayErrorAlert('Passwords do not match');
       return;
     }
 
@@ -44,10 +56,10 @@ const Login = () => {
       const data = await response.text();
 
       if (response.ok) {
-        setAlert({ show: true, message: data, type: 'success' });
+        displaySuccessAlert('Registration successful!');
         if (isRegistering) {
           setIsRegistering(false);
-          setFormData({ ...formData, password: '', confirmPassword: '' });
+          setFormData({ netID: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
         } else {
           navigate('/profile');
         }
@@ -55,28 +67,23 @@ const Login = () => {
         throw new Error(data);
       }
     } catch (error) {
-      setAlert({ show: true, message: error.message, type: 'danger' });
+      displayErrorAlert(error.message);
     }
   };
 
   const switchMode = () => {
     setIsRegistering(!isRegistering);
-    setAlert({ show: false, message: '', type: '' });
-    setFormData({
-      netID: isRegistering ? formData.netID : '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    });
+    setFormData({ netID: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
+    setSuccessAlert({ show: false, message: '' });
+    setErrorAlert({ show: false, message: '' });
   };
 
   return (
     <div className="login-page">
       <div className={`form-container ${isRegistering ? 'register-container' : ''}`}>
         <h2>{isRegistering ? 'Register' : 'Login'}</h2>
-        {alert.show && <Alert variant={alert.type}>{alert.message}</Alert>}
+        {successAlert.show && <Alert variant="success">{successAlert.message}</Alert>}
+        {errorAlert.show && <Alert variant="danger">{errorAlert.message}</Alert>}
         <form onSubmit={handleSubmit}>
           <input type="text" name="netID" placeholder="NetID" value={formData.netID} onChange={handleChange} required />
           {isRegistering && (
@@ -88,21 +95,25 @@ const Login = () => {
               <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required />
             </>
           )}
-          {!isRegistering && <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />}
+          {!isRegistering && (
+            <>
+              <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
+            </>
+          )}
           <button type="submit">{isRegistering ? 'Register' : 'Login'}</button>
         </form>
         {isRegistering ? (
           <p>
-            Already have an account? <span onClick={switchMode}>Login</span>
+            Already have an account? <span onClick={switchMode} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Login</span>
           </p>
         ) : (
           <p>
-            Don't have an account? <span onClick={switchMode}>Register</span>
+            Don't have an account? <span onClick={switchMode} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Register</span>
           </p>
         )}
       </div>
     </div>
   );
-};
+} ;
 
 export default Login;
