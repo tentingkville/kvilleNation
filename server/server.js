@@ -5,6 +5,7 @@ const PORT = process.env.PORT || 8081;
 const url = process.env.MONGO_URL;
 const mongoose = require('mongoose');
 const profileRoutes = require('./routes/userRoutes');
+const tentRoutes = require('./routes/tentRoutes');
 
 app.use(express.json()); // Use Express' built-in JSON parser
 
@@ -22,6 +23,7 @@ app.use(function(req, res, next) {
 });
 
 app.use('/api/profile', profileRoutes);
+app.use('/api/tent', tentRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

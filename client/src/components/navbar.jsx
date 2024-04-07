@@ -3,6 +3,13 @@ import './navbar.css';
 import { NavLink } from 'react-router-dom';
 import { IoIosArrowDropdown, IoIosCloseCircleOutline } from 'react-icons/io';
 
+// Simulated User Context/State (replace this with actual context or state logic)
+const user = {
+  isAuthenticated: true, // Assume user is authenticated for demonstration
+  isLineMonitor: true,
+  isSuperUser: true,
+};
+
 export default function Navbar() {
     const [isNavExpanded, setIsNavExpanded] = useState(false);
 
@@ -22,11 +29,35 @@ export default function Navbar() {
                     <NavLink to="/policy" className="nav-link" activeClassName="active">Policy</NavLink>
                     <NavLink to="/calendar" className="nav-link" activeClassName="active">Calendar</NavLink>
                     <NavLink to="/line-monitors" className="nav-link" activeClassName="active">Line Monitors</NavLink>
-                    <NavLink to="/profile" className="nav-link mobile-profile-link" activeClassName="active">Profile</NavLink>
+                    {/* Conditional Navigation Links based on User Role */}
+                    {user.isLineMonitor && (
+                        <>
+                            <NavLink to="/tent-check" className="nav-link" activeClassName="active">Tent Check</NavLink>
+                            <NavLink to="/form" className="nav-link" activeClassName="active">Form</NavLink>
+                        </>
+                    )}
+                    {user.isSuperUser && (
+                        <NavLink to="/lm-dashboard" className="nav-link" activeClassName="active">LM Dashboard</NavLink>
+                    )}
+                    {/* Show Profile or Sign In based on Authentication Status */}
+                    <NavLink 
+                        to={user.isAuthenticated ? "/profile" : "/sign-in"} 
+                        className="nav-link mobile-profile-link" 
+                        activeClassName="active"
+                    >
+                        {user.isAuthenticated ? "Profile" : "Sign In"}
+                    </NavLink>
                 </div>
             </div>
             <div className="nav-section right">
-                <NavLink to="/profile" className="nav-link profile-link" activeClassName="active">Profile</NavLink>
+                {/* Show Profile or Sign In based on Authentication Status */}
+                <NavLink 
+                    to={user.isAuthenticated ? "/profile" : "/sign-in"} 
+                    className="nav-link profile-link" 
+                    activeClassName="active"
+                >
+                    {user.isAuthenticated ? "Profile" : "Sign In"}
+                </NavLink>
             </div>
         </nav>
     );

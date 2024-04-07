@@ -10,6 +10,7 @@ import Calendar from './pages/calendar.jsx';
 import LineMonitors from './pages/lineMonitors.jsx';
 import Profile from './pages/profile.jsx';
 import Login from './pages/login.jsx';
+import TentSummary from './pages/tentSummary.jsx';
 
 
 // import { AuthProvider, useAuth } from './AuthContext'; 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/line-monitors" element={<LineMonitors />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/tent-summary" element={<TentSummary />} />
         </Routes>
     </div>
 );

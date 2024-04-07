@@ -8,14 +8,13 @@ services:
       - '3000:3000'
     volumes:
       - ./client:/app
-      - node-modules-volume-react:/app/node_modules
+      - node-modules-volume-react:/app/node_modules 
     stdin_open: true
     tty: true
 
   mongo:
     container_name: mongo
-    image: arm64v8/mongo
-    platform: linux/arm64/v8
+    image: mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -24,6 +23,7 @@ services:
       - 27017:27017
     volumes:
      - ./db:/data/db
+
   # mongo-express service
   mongo-express:
     depends_on:
@@ -41,7 +41,7 @@ services:
 
     volumes:
       - ./server:/app
-      - node-modules-volume-express:/app/node_modules # this mount keeps node_modules from getting wiped when we mount the container
+      - node-modules-volume-express:/app/node_modules 
 volumes:
   node-modules-volume-react:
   node-modules-volume-express:
