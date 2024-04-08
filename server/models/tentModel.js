@@ -7,7 +7,7 @@ const tentSchema = new Schema({
     dateOfRegistration: { type: Date, required: true },
     captainName: { type: String, required: true },
     members: { type: Map, of: String, required: true }, // Assuming members are a map with netID as key and memberName as value
-    nameOfTent: String, // This field is not marked as required, assuming it was a typo in your list
+    nameOfTent: String, 
     typeOfTent: { type: String, required: true },
     numberOfMisses: { type: Number, required: true },
     startDate: { type: Date, required: true },
