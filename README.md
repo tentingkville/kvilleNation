@@ -27,11 +27,11 @@
 
   * Build docker image and start application
     * `cd path/to/kvilleNation`
-    * `docker-compose build` - builds the images (will take a while)
-    * `docker-compose up` - command to start the application
+    * `docker compose build` - builds the images (will take a while)
+    * `docker compose up` - command to start the application
 
   * Initialize Database
-    * `docker-compose exec mongo bash` - get a shell on the db
+    * `docker compose exec mongo bash` - get a shell on the db
     * `mongosh --username root --password password` - login to db
     * `use development` - switch to dev db
     *  run the following code:
@@ -57,12 +57,6 @@
       * If empty, create collection "users". If collections exist, click "users"
       * Click "Add Data" --> "Insert Document"
       * Add yourself as an admin user in JSON format (example: {"name": "Your Name", "netid": "abc123", "role": "admin"})
-    * To use seed document(optional)
-      * This will **wipe the current local database**, so don't do this on dev or prod!!!
-      * in the terminal, type `docker-compose exec express bash`
-      * once in the bash shell, type `node seed_db.js`
-      * It will ask for your name, netid and number of fake employees
-      * This seed file will generate some schedules and shifts for you
     
   * Restart Docker 
     * Close out of Compass
@@ -74,20 +68,20 @@
     * If you are working on Windows, and the login page is not working, check Docker to see if shifter_express is running. If not, you may have to run the following command in your terminal `cd express` followed by `sed -i -e 's/\r$//' start_app.sh`.
 
 3. docker-compose commands
-  * `docker-compose build` - builds the images. This must be run if we install more npm packages
-  * `docker-compose up` - starts the containers (react, express, mongo)
-  * `docker-compose down` - tears down  the containers, run this when done
-  * `docker-sync start` - start docker-sync if it's not
-  * `docker-sync stop` - stop docker-sync
-  * `docker-compose exec <servicename> bash` - give you a bash shell in your selected container replace *servicename* with service, e.g. react, express, mongo. 
-  * `docker-compose logs -f servicename` - attach terimal to log output of a service
+  * `docker compose build` - builds the images. This must be run if we install more npm packages
+  * `docker compose up` - starts the containers (react, express, mongo)
+  * `docker compose down` - tears down  the containers, run this when done
+  * `docker sync start` - start docker-sync if it's not
+  * `docker sync stop` - stop docker-sync
+  * `docker compose exec <servicename> bash` - give you a bash shell in your selected container replace *servicename* with service, e.g. react, express, mongo. 
+  * `docker compose logs -f servicename` - attach terimal to log output of a service
   * `docker container ls` — views all the running containers
   * `docker system prune` -- delete all images and volumes to free up space
 
 4. Notes and GOTCHAS
   * note that all environment variables for **REACT** **MUST** be prefixed with `REACT_APP`
   * adding an npm package
-    1. start the container and run `docker-compose exec <servicename> bash`
+    1. start the container and run `docker compose exec <servicename> bash`
     2. you now have bash shell inside the container. run `npm install <yourPackage> --save`
     3. `exit`
     4. Pro Tip: Download Mongo Compass and use that to view/interact with the DB. 
