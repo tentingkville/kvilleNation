@@ -1,6 +1,4 @@
-/* navbar.css */
-
-/* Resets to ensure consistent styling */
+/* General Reset and Nav Styles */
 * {
   margin: 0;
   padding: 0;
@@ -13,34 +11,35 @@
   align-items: center;
   background-color: #002b7f;
   color: white;
-  padding: 1em 0.5em;
-  position: sticky; /* Make the navbar fixed at the top of the viewport */
-  top: 0; /* Align to the top */
-  left: 0; /* Align to the left */
-  width: 100%; /* Ensure it spans the full width of the viewport */
-  z-index: 1000; /* Ensure it appears above other elements */
+  padding: 1em;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
-
-
-.nav-section {
-  display: flex;
-  align-items: center;
-  /* Added to ensure the left section aligns to the left */
-  justify-content: flex-start; 
+.nav-link.app-name {
+  font-weight: bold;
+  font-size: 1.5em;
+  margin-right: 20px; /* Space between logo and nav links */
 }
 
 .nav-section.left {
-  flex: 1; /* Allows the left section to take up available space */
+  display: flex;
+  align-items: center;
+}
+
+.nav-section.left .nav-menu {
+  display: flex; /* Display menu items horizontally */
+  margin-left: 1em; /* Space between logo and menu */
 }
 
 .nav-link {
   color: white;
   text-decoration: none;
-  padding: 0.25em 0;
-  margin: 0 1em;
+  padding: 0.5em;
+  margin: 0 0.5em;
   position: relative;
 }
-
 
 .nav-link::after {
   content: '';
@@ -52,80 +51,80 @@
   height: 2px;
   transition: left 0.3s ease, right 0.3s ease;
 }
+
 .nav-link.active:not(.app-name)::after {
-  content: '';
-  position: absolute;
-  left: 0; /* Extend the underline across the entire element */
-  right: 0; /* Extend the underline across the entire element */
-  bottom: 0;
-  background: #f9a01b; /* Orange color for the underline */
-  height: 2px; /* Thickness of the underline */
-  transition: left 0.3s ease, right 0.3s ease;
+  left: 0;
+  right: 0;
 }
 
 .nav-link:hover::after {
   left: 0;
   right: 0;
 }
-
-.app-name {
-  font-weight: bold;
-  font-size: 1.5em;
+.nav-section.right {
+  margin-left: auto; /* Pushes right section to the far right */
+  display: flex;
+  align-items: center;
 }
 
 .nav-toggle {
-  display: none; /* Hide the toggle button by default */
+  display: none; /* Hide toggle button on desktop */
 }
 
-.right {
-  justify-content: flex-end;
+.logout-button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: inherit;
+  margin-left: 10px;
 }
 
-.mobile-profile-link {
-  display: none;
-}
-
-/* Mobile view */
-
+/* Mobile-Specific Styles */
 @media (max-width: 768px) {
-  .nav-section.right .profile-link {
-    display: none; /* Hide the original profile link on mobile */
-}
-
-.mobile-profile-link {
-    display: block; /* Show the profile link in the dropdown on mobile */
-}
   .nav-section.left {
     justify-content: flex-start;
   }
-  .nav-menu {
-    display: none;
+
+  .nav-section.left .nav-menu {
+    display: none; /* Hide menu by default on mobile */
     flex-direction: column;
     width: 100%;
+    background-color: #002b7f;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 1em 0;
+    z-index: 999;
   }
 
-  .nav-menu.show {
-    padding: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* Align to the right side */
+  .nav-section.left .nav-menu.show {
+    display: flex; /* Show menu when toggled */
+    align-items: flex-start;
   }
-  
+
+  .nav-section.left .nav-menu.show .nav-link {
+    padding: 10px 20px;
+    width: 100%;
+    text-align: left;
+  }
 
   .nav-toggle {
-    display:contents;
+    display: block; /* Show toggle button on mobile */
     font-size: 1.75em;
     cursor: pointer;
     color: white;
-    justify-content: flex-end;
-  
   }
 
   .nav-section.right {
-    display: none; /* Hide right section links on mobile */
+    display: none; /* Hide right section on mobile */
   }
-  .nav-menu.show .nav-link {
-    padding: 10px 20px; /* Adjust the top/bottom and left/right padding as needed */
+
+  .mobile-profile-link {
+    display: block; /* Show profile link inside menu */
+  }
+
+  .nav-section.right .profile-link {
+    display: none; /* Hide profile link in top bar on mobile */
   }
 }
-

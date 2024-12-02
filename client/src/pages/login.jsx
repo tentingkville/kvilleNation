@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Alert from 'react-bootstrap/Alert';
 import '../styles/login.css';
 import { useNavigate } from 'react-router-dom';
+import UserContext from '../userContext.js';
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext); // Get the setUser function from context
   const [isRegistering, setIsRegistering] = useState(false);
   const [formData, setFormData] = useState({
     netID: '',
@@ -22,7 +26,6 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Display functions for alerts
   const displaySuccessAlert = (message) => {
     setSuccessAlert({ show: true, message });
     setTimeout(() => setSuccessAlert({ show: false, message: '' }), 5000); // Automatically hide after 5 seconds
@@ -35,7 +38,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = `http://localhost:8081/api/profile/${isRegistering ? 'register' : 'login'}`;
+    const url = `${API_BASE_URL}/api/profile/${isRegistering ? 'register' : 'login'}`;
     const { netID, email, firstName, lastName, password, confirmPassword } = formData;
 
     if (isRegistering && password !== confirmPassword) {
@@ -51,20 +54,26 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        credentials: 'include' // Include credentials (cookies)
       });
-      const data = await response.text();
+      const data = await response.json(); // Assuming the server returns JSON data
 
       if (response.ok) {
-        displaySuccessAlert('Registration successful!');
+        displaySuccessAlert(isRegistering ? 'Registration successful!' : 'Login successful!');
         if (isRegistering) {
           setIsRegistering(false);
           setFormData({ netID: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
         } else {
+          setUser({
+            isAuthenticated: true,
+            isLineMonitor: data.isLineMonitor,
+            isSuperUser: data.isSuperUser,
+          });
           navigate('/profile');
         }
       } else {
-        throw new Error(data);
+        throw new Error(data.message || 'Something went wrong');
       }
     } catch (error) {
       displayErrorAlert(error.message);
@@ -76,6 +85,33 @@ const Login = () => {
     setFormData({ netID: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
     setSuccessAlert({ show: false, message: '' });
     setErrorAlert({ show: false, message: '' });
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/profile/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // Include credentials (cookies)
+      });
+
+      if (response.ok) {
+        // Clear user context or state
+        setUser({
+          isAuthenticated: false,
+          isLineMonitor: false,
+          isSuperUser: false,
+        });
+        navigate('/'); // Redirect to home page or another appropriate page
+      } else {
+        const error = await response.text();
+        console.error('Logout failed:', error);
+      }
+    } catch (error) {
+      console.error('Logout request error:', error);
+    }
   };
 
   return (
@@ -104,16 +140,19 @@ const Login = () => {
         </form>
         {isRegistering ? (
           <p>
-            Already have an account? <span onClick={switchMode} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Login</span>
+            Already have an account? <span onClick={switchMode} style={{ cursor: 'pointer'}}>Login</span>
           </p>
         ) : (
           <p>
-            Don't have an account? <span onClick={switchMode} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Register</span>
+            Don't have an account? <span onClick={switchMode} style={{ cursor: 'pointer'}}>Register</span>
           </p>
+        )}
+        {user.isAuthenticated && (
+          <button onClick={handleLogout} className="nav-link">Logout</button>
         )}
       </div>
     </div>
   );
-} ;
+};
 
 export default Login;

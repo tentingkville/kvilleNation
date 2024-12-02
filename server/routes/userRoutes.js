@@ -32,6 +32,10 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { netID, password } = req.body;
 
+    if (!netID || !password) {
+        return res.status(400).send('NetID and password are required');
+    }
+
     try {
         const user = await kvilleProfiles.findOne({ netID });
         if (!user) {
@@ -43,9 +47,45 @@ router.post('/login', async (req, res) => {
             return res.status(400).send('Invalid credentials');
         }
 
-        res.send('User logged in successfully');
+        // Set the user information in the session
+        req.session.user = {
+            netID: user.netID,
+            isLineMonitor: user.isLineMonitor,
+            isSuperUser: user.isSuperUser,
+        };
+
+        res.send({
+            isAuthenticated: true,
+            isLineMonitor: user.isLineMonitor,
+            isSuperUser: user.isSuperUser,
+        });
     } catch (error) {
         res.status(500).send(error.message);
+    }
+});
+
+router.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error('Session destruction error:', err);
+            return res.status(500).send('Failed to log out');
+        }
+        res.clearCookie('connect.sid'); 
+        res.send('User logged out successfully');
+    });
+});
+
+router.get('/check-auth', (req, res) => {
+    console.log('Received request on /check-auth');
+    console.log('Session data:', req.session);
+    if (req.session.user) {
+        res.json({
+            isAuthenticated: true,
+            isLineMonitor: req.session.user.isLineMonitor,
+            isSuperUser: req.session.user.isSuperUser,
+        });
+    } else {
+        res.json({ isAuthenticated: false });
     }
 });
 

@@ -11,6 +11,8 @@ import LineMonitors from './pages/lineMonitors.jsx';
 import Profile from './pages/profile.jsx';
 import Login from './pages/login.jsx';
 import TentSummary from './pages/tentSummary.jsx';
+import { UserProvider } from './userContext.js';
+import TentCheck from './pages/tentCheck.jsx';
 
 
 // import { AuthProvider, useAuth } from './AuthContext'; 
@@ -39,6 +41,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/tent-summary" element={<TentSummary />} />
+          <Route path="/tent-check" element={<TentCheck />} />
         </Routes>
     </div>
 );
@@ -47,7 +50,9 @@ function App() {
 const root = createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
+    <UserProvider>
       <App />
+    </UserProvider>
   </BrowserRouter>
 
 );

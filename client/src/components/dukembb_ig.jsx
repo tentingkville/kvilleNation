@@ -33,14 +33,11 @@ const InstagramEmbedDukeMBB = () => {
       }}
     >
       <div style={{ padding: '16px' }}>
-        {/* ... other elements that you might want to style or add here */}
         <a href="https://www.instagram.com/dukembb/?utm_source=ig_embed&amp;utm_campaign=loading"
            style={{ background: '#FFFFFF', lineHeight: '0', padding: '0 0', textAlign: 'center', textDecoration: 'none', width: '100%' }}
            target="_blank">
-          {/* ... additional content here */}
           View this profile on Instagram
         </a>
-        {/* ... additional elements */}
       </div>
       <p style={{
         color: '#c9c8cd',

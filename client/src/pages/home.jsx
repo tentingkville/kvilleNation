@@ -15,7 +15,6 @@ const Home = () => {
     numTents: 0,
   });
   const handleRegisterClick = () => {
-    // Handle the click event for the register button
     console.log('Register button clicked');
   };
 
@@ -37,7 +36,7 @@ const Home = () => {
         const awayTeam = teamData.nextEvent[0].competitions[0].competitors[1].team.displayName;
         nextOpponent = homeTeam === "Duke Blue Devils" ? awayTeam : homeTeam;
 
-        let numTents = 0; // Fetch this value accordingly
+        let numTents = 0; // Fetch this value later
 
         setData({ record, standing, nextOpponent, rank, numTents });
       } catch (error) {
