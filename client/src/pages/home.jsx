@@ -23,7 +23,7 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          'http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams/duke'
+          'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams/duke'
         );
         const teamData = response.data.team;
 
