@@ -39,7 +39,6 @@ function App() {
           <Route path="/line-monitors" element={<LineMonitors />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/tent-summary" element={<TentSummary />} />
           <Route path="/tent-check" element={<TentCheck />} />
         </Routes>
     </div>
