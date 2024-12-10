@@ -10,7 +10,6 @@ import Calendar from './pages/calendar.jsx';
 import LineMonitors from './pages/lineMonitors.jsx';
 import Profile from './pages/profile.jsx';
 import Login from './pages/login.jsx';
-import TentSummary from './pages/tentSummary.jsx';
 import { UserProvider } from './userContext.js';
 import TentCheck from './pages/tentCheck.jsx';
 
