@@ -165,6 +165,10 @@ app.post('/api/cancel-check', (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the Tent Check API");
+});
+
 // Start the server
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
