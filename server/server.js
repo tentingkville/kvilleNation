@@ -85,12 +85,14 @@ app.get('/api/tent-checks', async (req, res) => {
       }
     );
 
+    console.log('Raw Airtable response:', response.data);
+
     const tents = response.data.records.map((record) => ({
       id: record.id,
-      order: record.fields['Order'],
-      captain: record.fields['Captain'],
-      members: record.fields['Members'],
-      type: record.fields['Type'],
+      order: record.fields['Order'] || 0, 
+      captain: record.fields['Captain'] || '',
+      members: record.fields['Members'] || '',
+      type: record.fields['Type'] || '',
       dayNumber: record.fields['Day Number'] || null,
       nightNumber: record.fields['Night Number'] || null,
       numberOfMisses: record.fields['Number of Misses'] || 0,
@@ -99,6 +101,8 @@ app.get('/api/tent-checks', async (req, res) => {
       lastMissLM: record.fields['Last Miss LM'] || null,
       dateOfLastMiss: record.fields['Date of Last Miss'] || null,
     }));
+
+    console.log('Transformed tents:', tents);
 
     tents.sort((a, b) => a.order - b.order);
     res.json(tents);
