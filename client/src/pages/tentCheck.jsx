@@ -21,6 +21,7 @@ const TentCheck = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
+        console.log(API_BASE_URL);
         const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`);
         const sortedTents = tentsResponse.data.sort((a, b) => a.order - b.order);
 
