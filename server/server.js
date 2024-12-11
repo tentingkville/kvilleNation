@@ -3,13 +3,22 @@ const axios = require('axios');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
+const session = require('express-session'); // Add session support
+const MongoStore = require('connect-mongo'); // For MongoDB session storage
 require('dotenv').config();
+const UserRoute = require('./routes/userRoutes');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', 
+    origin: (origin, callback) => {
+      if (allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   },
@@ -17,16 +26,47 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 8081;
 
+// Allowed Origins
+const allowedOrigins = ['http://localhost:3000', 'https://kville-nation-frontend.vercel.app'];
+
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // Enable credentials
+  })
+);
 app.use(express.json());
 
-// Global variables
+// Configure session middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET, // Replace with a secure secret
+    resave: false, // Do not resave sessions that have not been modified
+    saveUninitialized: false, // Do not save uninitialized sessions
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URL, // MongoDB connection string
+      ttl: 14 * 24 * 60 * 60, // Session expiration in seconds (14 days)
+    }),
+    cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true, // Prevent access to cookies via JavaScript
+    },
+  })
+);
+
+// Global Variables
 let isCheckInProgress = false;
 let activeTents = [];
 let numCheckers = 1; // Initialize numCheckers
 
-// Socket.io for real-time updates
+// Socket.IO for real-time updates
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
 
@@ -36,7 +76,7 @@ io.on('connection', (socket) => {
       socket.emit('checkAlreadyStarted');
     } else {
       isCheckInProgress = true;
-      numCheckers = clientNumCheckers || 1; // Update numCheckers
+      numCheckers = clientNumCheckers || 1;
       const chunkSize = Math.ceil(tents.length / numCheckers);
       let assignedTents = [...tents];
       for (let i = 0; i < numCheckers; i++) {
@@ -47,8 +87,7 @@ io.on('connection', (socket) => {
           tent.groupIndex = i;
         });
       }
-      activeTents = assignedTents; // Set active tents with groupIndex
-      console.log('Assigned Tents with groupIndex:', activeTents);
+      activeTents = assignedTents;
       io.emit('checkStarted', activeTents);
       console.log('A new check has started');
     }
@@ -57,13 +96,12 @@ io.on('connection', (socket) => {
   socket.on('cancelCheck', () => {
     isCheckInProgress = false;
     activeTents = [];
-    numCheckers = 1; // Reset numCheckers
+    numCheckers = 1;
     io.emit('checkCanceled');
     console.log('Check canceled');
   });
 
   socket.on('updateTentStatus', (data) => {
-    // Update activeTents to remove the processed tent
     activeTents = activeTents.filter((tent) => tent.id !== data.id);
     io.emit('tentStatusUpdated', { id: data.id });
   });
@@ -85,11 +123,9 @@ app.get('/api/tent-checks', async (req, res) => {
       }
     );
 
-    console.log('Raw Airtable response:', response.data);
-
     const tents = response.data.records.map((record) => ({
       id: record.id,
-      order: record.fields['Order'] || 0, 
+      order: record.fields['Order'] || 0,
       captain: record.fields['Captain'] || '',
       members: record.fields['Members'] || '',
       type: record.fields['Type'] || '',
@@ -159,7 +195,7 @@ app.post('/api/cancel-check', (req, res) => {
   try {
     isCheckInProgress = false;
     activeTents = [];
-    numCheckers = 1; // Reset numCheckers
+    numCheckers = 1;
     io.emit('checkCanceled');
     res.status(200).send('Check canceled successfully');
     console.log('Check canceled successfully');
@@ -169,9 +205,8 @@ app.post('/api/cancel-check', (req, res) => {
   }
 });
 
-app.get("/", (req, res) => {
-  res.send("Welcome to the Tent Check API");
-});
+// Mount routes
+app.use('/api/profile', UserRoute);
 
 // Start the server
 // server.listen(PORT, () => {
