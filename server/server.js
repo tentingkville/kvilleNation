@@ -183,8 +183,13 @@ app.get('/api/check-status', (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('Hello from the server side!');
+});
+
 // Mount user routes
 app.use('/api/profile', UserRoute);
+
 
 const PORT = process.env.PORT || 8081;
 // app.listen(PORT, () => {
