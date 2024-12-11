@@ -43,8 +43,7 @@ const TentCheck = () => {
       cluster: process.env.REACT_APP_PUSHER_CLUSTER,
     });
 
-    // Subscribe to a channel (you can name it something meaningful, e.g. 'tent-check-channel')
-    const channel = pusher.subscribe('tent-check-channel');
+    const channel = pusher.subscribe('kville-nation');
 
     // Replaces socket.on('checkStarted', ...)
     channel.bind('checkStarted', (activeTents) => {
@@ -67,7 +66,7 @@ const TentCheck = () => {
 
     // Cleanup when component unmounts
     return () => {
-      pusher.unsubscribe('tent-check-channel');
+      pusher.unsubscribe('kville-nation');
     };
   }, []); // Empty dependency array to run only once
 

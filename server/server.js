@@ -15,11 +15,6 @@ const pusher = new Pusher({
   cluster: process.env.PUSHER_CLUSTER,
   useTLS: true
 });
-console.log('Pusher App ID:', process.env.PUSHER_APP_ID);
-console.log('Pusher Key:', process.env.PUSHER_KEY);
-console.log('Pusher Secret:', process.env.PUSHER_SECRET);
-console.log('Pusher Cluster:', process.env.PUSHER_CLUSTER);
-
 const app = express();
 
 // Allowed Origins
@@ -85,7 +80,7 @@ app.post('/api/start-check', (req, res) => {
   activeTents = assignedTents;
 
   // Trigger Pusher event instead of io.emit
-  pusher.trigger('tent-check-channel', 'checkStarted', activeTents);
+  pusher.trigger('kville-nation', 'checkStarted', activeTents);
   console.log('A new check has started');
   res.status(200).json({ success: true });
 });
@@ -98,7 +93,7 @@ app.post('/api/cancel-check', (req, res) => {
     numCheckers = 1;
 
     // Trigger Pusher event
-    pusher.trigger('tent-check-channel', 'checkCanceled', {});
+    pusher.trigger('kville-nation', 'checkCanceled', {});
     console.log('Check canceled successfully');
     res.status(200).send('Check canceled successfully');
   } catch (error) {
@@ -126,7 +121,7 @@ app.post('/api/tent-checks/update', async (req, res) => {
     );
 
     activeTents = activeTents.filter((tent) => tent.id !== id);
-    pusher.trigger('tent-check-channel', 'tentStatusUpdated', { id });
+    pusher.trigger('kville-nation', 'tentStatusUpdated', { id });
 
     res.status(200).send('Tent data updated successfully');
   } catch (error) {
