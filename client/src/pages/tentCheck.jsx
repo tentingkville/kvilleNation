@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+import Pusher from 'pusher-js';
 import axios from 'axios';
-import '../styles/tentCheck.css'; // Include your CSS file
+import '../styles/tentCheck.css'; 
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-const socket = io(API_BASE_URL); // WebSocket connection
 
 const TentCheck = () => {
   const [tents, setTents] = useState([]);
@@ -17,11 +16,9 @@ const TentCheck = () => {
     parseInt(localStorage.getItem('currentPage')) || 0
   ); // Load currentPage from local storage or default to 0
 
-  // Fetch tents and check state on component load
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        console.log(API_BASE_URL, 'API_BASE_URL');
         const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`);
         const sortedTents = tentsResponse.data.sort((a, b) => a.order - b.order);
 
@@ -41,43 +38,52 @@ const TentCheck = () => {
 
     fetchInitialData();
 
-    // Set up socket listeners
-    socket.on('checkStarted', (activeTents) => {
-      setIsCheckStarted(true);
-      setTents(activeTents); // activeTents already have groupIndex assigned
+    // Initialize Pusher
+    const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
+      cluster: process.env.REACT_APP_PUSHER_CLUSTER,
     });
 
-    socket.on('tentStatusUpdated', (data) => {
+    // Subscribe to a channel (you can name it something meaningful, e.g. 'tent-check-channel')
+    const channel = pusher.subscribe('tent-check-channel');
+
+    // Replaces socket.on('checkStarted', ...)
+    channel.bind('checkStarted', (activeTents) => {
+      setIsCheckStarted(true);
+      setTents(activeTents);
+    });
+
+    // Replaces socket.on('tentStatusUpdated', ...)
+    channel.bind('tentStatusUpdated', (data) => {
       setTents((prevTents) => prevTents.filter((tent) => tent.id !== data.id));
     });
 
-    socket.on('checkCanceled', () => {
+    // Replaces socket.on('checkCanceled', ...)
+    channel.bind('checkCanceled', () => {
       setIsCheckStarted(false);
       setTents([]);
       setCurrentPage(0);
       localStorage.setItem('currentPage', 0); // Reset pagination on cancel
     });
 
+    // Cleanup when component unmounts
     return () => {
-      socket.off('checkStarted');
-      socket.off('tentStatusUpdated');
-      socket.off('checkCanceled');
+      pusher.unsubscribe('tent-check-channel');
     };
   }, []); // Empty dependency array to run only once
 
   const getCurrentDateTime = () => {
     const now = new Date();
     const options = { month: 'numeric', day: 'numeric', year: 'numeric' };
-    const date = now.toLocaleDateString('en-US', options); // Format: 3/1/2024
+    const date = now.toLocaleDateString('en-US', options);
     const time = now.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-    }); // Format: 8:49am
+    });
     return `${date} ${time}`;
   };
 
-  const handleStartCheck = () => {
+  const handleStartCheck = async () => {
     if (isCheckStarted) {
       alert('A check has already started.');
       return;
@@ -98,18 +104,26 @@ const TentCheck = () => {
     setTents(assignedTents);
     setIsCheckStarted(true);
 
-    socket.emit('startCheck', { tents: assignedTents, numCheckers });
-
-    alert('Check started!');
+    // Instead of socket.emit, we call an API endpoint that triggers the Pusher event
+    try {
+      await axios.post(`${API_BASE_URL}/api/start-check`, {
+        tents: assignedTents,
+        numCheckers,
+      });
+      alert('Check started!');
+    } catch (error) {
+      console.error('Error starting check:', error);
+    }
   };
 
   const handleCancelCheck = async () => {
     try {
       await axios.post(`${API_BASE_URL}/api/cancel-check`);
+      // No need to manually set state here if the Pusher event handles it, but we do just in case
       setIsCheckStarted(false);
       setTents([]);
       setCurrentPage(0);
-      localStorage.setItem('currentPage', 0); // Reset pagination
+      localStorage.setItem('currentPage', 0);
       alert('Check has been canceled');
     } catch (error) {
       console.error('Error canceling check:', error);
@@ -140,12 +154,12 @@ const TentCheck = () => {
     }
     const newNumCheckers = parseInt(e.target.value) || 1;
     setNumCheckers(newNumCheckers);
-    localStorage.setItem('numCheckers', newNumCheckers); // Save to local storage
+    localStorage.setItem('numCheckers', newNumCheckers);
   };
 
   const handlePageChange = (pageIndex) => {
     setCurrentPage(pageIndex);
-    localStorage.setItem('currentPage', pageIndex); // Save current page to local storage
+    localStorage.setItem('currentPage', pageIndex);
   };
 
   const handleMiss = async (tentId) => {
@@ -156,7 +170,7 @@ const TentCheck = () => {
         return;
       }
 
-      const lastMissLM = 'user'; // Replace with actual user (e.g., user.netID)
+      const lastMissLM = 'user'; // Replace with actual user info if needed
       const dateOfLastMiss = getCurrentDateTime();
 
       document.getElementById(`tent-${tentId}`).classList.add('removing');
@@ -168,13 +182,7 @@ const TentCheck = () => {
           lastMissLM,
           dateOfLastMiss,
         });
-
-        socket.emit('updateTentStatus', {
-          id: tentId,
-          misses: (tent.numberOfMisses || 0) + 1,
-          lastMissLM,
-          dateOfLastMiss,
-        });
+        // The backend triggers 'tentStatusUpdated' via Pusher, so no need for socket.emit
       }, 500);
     } catch (error) {
       console.error('Error marking miss:', error);
@@ -194,12 +202,7 @@ const TentCheck = () => {
           lastCheck: madeMembers.join(', ') || 'No members selected',
           dateOfLastCheck,
         });
-
-        socket.emit('updateTentStatus', {
-          id: tentId,
-          lastCheck: madeMembers.join(', ') || 'No members selected',
-          dateOfLastCheck,
-        });
+        // The backend triggers 'tentStatusUpdated' via Pusher
       }, 500);
     } catch (error) {
       console.error('Error marking make:', error);
@@ -243,19 +246,13 @@ const TentCheck = () => {
           {tentsInCurrentPage.map((tent) => (
             <div key={tent.id} id={`tent-${tent.id}`} className="tent-card">
               <h2>Tent {tent.order}</h2>
-              <p>
-                <strong>Day Number:</strong> {tent.dayNumber}
-              </p>
-              <p>
-                <strong>Night Number:</strong> {tent.nightNumber}
-              </p>
+              <p><strong>Day Number:</strong> {tent.dayNumber}</p>
+              <p><strong>Night Number:</strong> {tent.nightNumber}</p>
               <ul className="members-list">
                 {tent.members.split(',').map((member) => (
                   <li
                     key={member.trim()}
-                    className={
-                      selectedMembers[tent.id]?.includes(member.trim()) ? 'selected' : ''
-                    }
+                    className={selectedMembers[tent.id]?.includes(member.trim()) ? 'selected' : ''}
                     onClick={() => toggleSelection(tent.id, member.trim())}
                   >
                     {member.trim()}
