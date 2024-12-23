@@ -15,9 +15,8 @@ const Home = () => {
     numTents: 0,
   });
   const handleRegisterClick = () => {
-    console.log('Register button clicked');
+    window.location.href = 'https://urldefense.com/v3/__https://airtable.com/appbGqvufDAWCGhHt/pagNNgAB0Gmk9eEUw/form__;!!OToaGQ!uTOLWvujpA-zomUgetPUhJ7jgQVYQJvs2MX3cfIa0-p3CApd4njiOQZvP9LvrT9LIMZDHUmPVYNYx7SsMITUg4cpWShg$';
   };
-
 
   useEffect(() => {
     const fetchData = async () => {

@@ -1,120 +1,116 @@
-/* Home.css */
 .all-of-home:not(.register-button) {
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-    justify-content: center; /* Center children horizontally */
-    width: 100%; /* Take the full viewport width */
-    max-width: 1200px; /* Or the maximum width you prefer */
-    margin: auto; /* This will center the div if it has a max-width */
-    padding-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding-bottom: 30px;
 }
 .bubble-container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-    margin-top: 20px ;
-    max-width: 1200px;
-  }
-  .bubble-container-spotify{
-    background-color: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-    margin-top: 20px;
-    max-width: 400px;
-    width: 100%;
-  }
-  .stats-row {
-    display: flex;
-    justify-content: space-around;
-    text-align: center;
-    padding: 10px 0;
-  }
-  
-  .stat-box {
-    padding: 10px;
-
-  }
-  .header img {
-    width: 100%; /* Make the image responsive */
-    height: auto; /* Maintain aspect ratio */
-    border-radius: 10px; 
-  }
-  .dukeStats {
-    display: flex;
-    justify-content: space-around;
-    text-align: center;
-    font-weight:700;
-    font-size:x-large;
-    margin-top: 10px;
-  }
-.content-row {
-    display: flex;
-    align-items: flex-start; /* Align children to the top */
-    justify-content: space-between;
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+  margin-top: 20px;
+  max-width: 1200px;
 }
-.final-home-row{
-    background-color: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-    max-width: 400px;
-    margin-top: -420px;
-    height: 100%;
+.bubble-container-spotify {
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+  margin-top: 20px;
+  max-width: 400px;
+  width: 100%;
+}
+.stats-row {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  padding: 10px 0;
+}
+.stat-box {
+  padding: 10px;
+}
+.header img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+.dukeStats {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  font-weight: 700;
+  font-size: x-large;
+  margin-top: 10px;
+}
+.content-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.final-home-row {
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+  max-width: 400px;
+  margin-top: -420px;
+  height: 100%;
 }
 .final-home-row, .bubble-container-spotify {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* This will distribute space inside the containers evenly */
-    height: 100%; /* This will make the div fill the height of .embeds-row */
-  }
-.embeds-row {
-    display: flex; /* This will place the children side by side */
-    align-items: stretch; /* Align children to the top */
-    gap: 50px; /* This adds some space between the children */
-    flex-wrap: wrap;
-  }
-
-.register-button {
-    background-color: #45bc49; /* Green background */
-    border: none;
-    color: white;
-    padding: 20px 303px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 20px;
-    cursor: pointer;
-    border-radius: 4px; /* Rounded corners */
-  }
- .register-button:hover {
-    background-color: #3f9e3f; /* Darker green */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
 }
-@media (max-width: 768px) { /* Adjust this breakpoint to your needs */
-    .content-row, .embeds-row {
-      flex-direction: column; /* Stack children vertically on small screens */
-      align-items: center; /* Center children horizontally */
-    }
-  
-    .final-home-row, .bubble-container-spotify {
-      max-width: 100%; /* Make these containers take the full width */
-      margin-top: 20px; /* Adjust top margin to prevent overlap */
-      height: auto; /* Reset height to auto to avoid fixed height issues */
-    }
-  
-    .register-button {
-      padding: 10px 200px; /* Reduce padding for smaller screens */
-      width: auto; /* Allow button width to adjust based on content and padding */
-    }
-  
-    .bubble-container {
-      max-width: 100%; /* Allow bubble containers to expand to full width */
-      margin: 10px 0; /* Adjust margin for vertical stacking */
-    }
-  
-    .stats-row, .stat-box {
-      flex-direction: column; /* Stack stats vertically */
-      text-align: center; /* Center text for a cleaner look */
-    }
-}  
+.embeds-row {
+  display: flex;
+  align-items: stretch;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+.register-button {
+  background-color: #45bc49;
+  border: none;
+  color: white;
+  padding: 20px 303px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.register-button:hover {
+  background-color: #3f9e3f;
+}
+@media (max-width: 768px) {
+  .embeds-row {
+    flex-direction: column; 
+    gap: 15px; 
+}
+  .content-row, .embeds-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  .final-home-row, .bubble-container-spotify {
+    max-width: 100%;
+    margin-top: 20px;
+    height: auto;
+  }
+  .register-button {
+    padding: 10px 200px;
+    width: auto;
+  }
+  .bubble-container {
+    max-width: 100%;
+    margin: 10px 0;
+  }
+  .stats-row, .stat-box {
+    flex-direction: column;
+    text-align: center;
+  }
+}
