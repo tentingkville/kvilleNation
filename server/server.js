@@ -28,7 +28,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Allowed Origins
-const allowedOrigins = ['http://localhost:3000', 'https://kville-nation-frontend.vercel.app', 'https://kvillenation.com'];
+const allowedOrigins = ['http://localhost:3000', 'https://kville-nation-frontend.vercel.app', 'https://kvillenation.com', 'https://www.kvillenation.com'];
 
 // CORS Middleware
 app.use(
@@ -243,3 +243,4 @@ const PORT = process.env.PORT || 8081;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+//module.exports = app;
