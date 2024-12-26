@@ -7,6 +7,20 @@ require('dotenv').config();
 const UserRoute = require('./routes/userRoutes');
 const http = require('http');
 const { Server } = require('socket.io');
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+mongoose.connection.on('connected', () => {
+  console.log('Connected to MongoDB successfully');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('Error connecting to MongoDB:', err);
+});
 
 /** 
  * SET UP EXPRESS AND SOCKET.IO
