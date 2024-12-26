@@ -239,6 +239,8 @@ app.get('/', (req, res) => {
 
 // Mount user routes
 app.use('/api/profile', UserRoute);
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/events', require('./routes/eventRoutes'));
 
 /**
  * START THE SERVER IF LOCAL
