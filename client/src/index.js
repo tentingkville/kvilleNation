@@ -62,6 +62,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Catch-all route for undefined paths */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );
