@@ -5,25 +5,24 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 require('dotenv').config();
 const UserRoute = require('./routes/userRoutes');
-const Pusher = require('pusher');
+const http = require('http');
+const { Server } = require('socket.io');
 
-// Initialize Pusher
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.PUSHER_KEY,
-  secret: process.env.PUSHER_SECRET,
-  cluster: process.env.PUSHER_CLUSTER,
-  useTLS: true
-});
+/** 
+ * SET UP EXPRESS AND SOCKET.IO
+ */
 const app = express();
+const server = http.createServer(app);
 
 // Allowed Origins
-const allowedOrigins = ['http://localhost:3000', 'https://kville-nation-frontend.vercel.app'];
+const allowedOrigins = ['http://localhost:3000', 'https://kville-nation-frontend.vercel.app', 'https://kvillenation.com'];
 
+// CORS Middleware
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (allowedOrigins.includes(origin) || !origin) {
+      // Allow requests from listed origins or from no origin (e.g., server-to-server)
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -34,7 +33,7 @@ app.use(
 );
 app.use(express.json());
 
-// Configure session middleware
+// Session Middleware
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -45,16 +44,50 @@ app.use(
       ttl: 14 * 24 * 60 * 60,
     }),
     cookie: {
-      secure: false,
+      secure: false, // true if HTTPS
       httpOnly: true,
     },
   })
 );
 
-// Global Variables
+/**
+ * SOCKET.IO SERVER
+ */
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
+
+/** 
+ * GLOBAL VARIABLES
+ */
 let isCheckInProgress = false;
 let activeTents = [];
 let numCheckers = 1;
+
+/**
+ * SOCKET.IO: handle real-time events
+ */
+io.on('connection', (socket) => {
+  console.log(`Socket connected: ${socket.id}`);
+
+  // (Optional) If you want to emit the current check status to new connections:
+  if (isCheckInProgress) {
+    socket.emit('checkStarted', activeTents);
+  }
+
+  socket.on('disconnect', () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+  });
+});
+
+/**
+ * REST ENDPOINTS
+ * We call io.emit(...) to broadcast changes
+ */
 
 // Route to start check
 app.post('/api/start-check', (req, res) => {
@@ -68,6 +101,7 @@ app.post('/api/start-check', (req, res) => {
   const chunkSize = Math.ceil(tents.length / numCheckers);
   let assignedTents = [...tents];
 
+  // Assign groupIndex in chunks
   for (let i = 0; i < numCheckers; i++) {
     const start = i * chunkSize;
     const end = start + chunkSize;
@@ -79,10 +113,10 @@ app.post('/api/start-check', (req, res) => {
 
   activeTents = assignedTents;
 
-  // Trigger Pusher event instead of io.emit
-  pusher.trigger('kville-nation', 'checkStarted', activeTents);
+  // Broadcast via Socket.IO
+  io.emit('checkStarted', activeTents);
   console.log('A new check has started');
-  res.status(200).json({ success: true });
+  return res.status(200).json({ success: true });
 });
 
 // Route to cancel the check
@@ -92,13 +126,13 @@ app.post('/api/cancel-check', (req, res) => {
     activeTents = [];
     numCheckers = 1;
 
-    // Trigger Pusher event
-    pusher.trigger('kville-nation', 'checkCanceled', {});
+    // Broadcast via Socket.IO
+    io.emit('checkCanceled');
     console.log('Check canceled successfully');
-    res.status(200).send('Check canceled successfully');
+    return res.status(200).send('Check canceled successfully');
   } catch (error) {
     console.error('Error canceling check:', error.message);
-    res.status(500).send('Failed to cancel check');
+    return res.status(500).send('Failed to cancel check');
   }
 });
 
@@ -114,19 +148,22 @@ app.post('/api/tent-checks/update', async (req, res) => {
   if (dateOfLastMiss) fieldsToUpdate['Date of Last Miss'] = dateOfLastMiss;
 
   try {
+    // Update Airtable
     await axios.patch(
       `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_ID}/${id}`,
       { fields: fieldsToUpdate },
       { headers: { Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}` } }
     );
 
+    // Remove this tent from activeTents
     activeTents = activeTents.filter((tent) => tent.id !== id);
-    pusher.trigger('kville-nation', 'tentStatusUpdated', { id });
 
-    res.status(200).send('Tent data updated successfully');
+    // Broadcast via Socket.IO
+    io.emit('tentStatusUpdated', { id });
+    return res.status(200).send('Tent data updated successfully');
   } catch (error) {
     console.error('Error updating tent data in Airtable:', error.response?.data || error.message);
-    res.status(500).send('Failed to update tent data');
+    return res.status(500).send('Failed to update tent data');
   }
 });
 
@@ -158,37 +195,41 @@ app.get('/api/tent-checks', async (req, res) => {
     }));
 
     tents.sort((a, b) => a.order - b.order);
-    res.json(tents);
+    return res.json(tents);
   } catch (error) {
     console.error('Error fetching tent data from Airtable:', error.response?.data || error.message);
-    res.status(500).send('Failed to fetch tent data');
+    return res.status(500).send('Failed to fetch tent data');
   }
 });
 
 // Route to get check status
 app.get('/api/check-status', (req, res) => {
   try {
-    res.json({
+    return res.json({
       isCheckInProgress,
       activeTents: isCheckInProgress ? activeTents : [],
     });
   } catch (error) {
     console.error('Error fetching check status:', error.message);
-    res.status(500).send('Failed to fetch check status');
+    return res.status(500).send('Failed to fetch check status');
   }
 });
 
+// Simple test route
 app.get('/', (req, res) => {
-  res.send('Hello from the server side!');
+  res.send('Hello from the Socket.IO server side!');
 });
 
 // Mount user routes
 app.use('/api/profile', UserRoute);
 
+/**
+ * START THE SERVER IF LOCAL
+ */
+// const PORT = process.env.PORT || 8081;
+// server.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
 
-const PORT = process.env.PORT || 8081;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-// module.exports = app;
+// use this for deployment
+module.exports = app;

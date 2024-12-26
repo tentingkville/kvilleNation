@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import Pusher from 'pusher-js';
+import { io } from 'socket.io-client';  // <-- Import from socket.io-client
 import axios from 'axios';
 import '../styles/tentCheck.css'; 
 
+// The URL of your deployed backend (e.g., https://your-backend.com)
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+// Initialize Socket.IO client with the backend URL
+// If you need credentials and CORS, enable { withCredentials: true }
+const socket = io(API_BASE_URL, { withCredentials: true });
 
 const TentCheck = () => {
   const [tents, setTents] = useState([]);
@@ -11,18 +16,23 @@ const TentCheck = () => {
   const [isCheckStarted, setIsCheckStarted] = useState(false);
   const [numCheckers, setNumCheckers] = useState(
     parseInt(localStorage.getItem('numCheckers')) || 1
-  ); // Load numCheckers from local storage or default to 1
+  );
   const [currentPage, setCurrentPage] = useState(
     parseInt(localStorage.getItem('currentPage')) || 0
-  ); // Load currentPage from local storage or default to 0
+  );
 
   useEffect(() => {
+    // 1) Fetch initial data from the backend
     const fetchInitialData = async () => {
       try {
-        const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`);
+        const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
+          withCredentials: true
+        });
         const sortedTents = tentsResponse.data.sort((a, b) => a.order - b.order);
 
-        const checkResponse = await axios.get(`${API_BASE_URL}/api/check-status`);
+        const checkResponse = await axios.get(`${API_BASE_URL}/api/check-status`, {
+          withCredentials: true
+        });
         const { isCheckInProgress, activeTents } = checkResponse.data;
 
         setIsCheckStarted(isCheckInProgress);
@@ -38,26 +48,17 @@ const TentCheck = () => {
 
     fetchInitialData();
 
-    // Initialize Pusher
-    const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
-      cluster: process.env.REACT_APP_PUSHER_CLUSTER,
-    });
-
-    const channel = pusher.subscribe('kville-nation');
-
-    // Replaces socket.on('checkStarted', ...)
-    channel.bind('checkStarted', (activeTents) => {
+    // 2) Listen for real-time Socket.IO events
+    socket.on('checkStarted', (activeTents) => {
       setIsCheckStarted(true);
       setTents(activeTents);
     });
 
-    // Replaces socket.on('tentStatusUpdated', ...)
-    channel.bind('tentStatusUpdated', (data) => {
+    socket.on('tentStatusUpdated', (data) => {
       setTents((prevTents) => prevTents.filter((tent) => tent.id !== data.id));
     });
 
-    // Replaces socket.on('checkCanceled', ...)
-    channel.bind('checkCanceled', () => {
+    socket.on('checkCanceled', () => {
       setIsCheckStarted(false);
       setTents([]);
       setCurrentPage(0);
@@ -66,22 +67,21 @@ const TentCheck = () => {
 
     // Cleanup when component unmounts
     return () => {
-      pusher.unsubscribe('kville-nation');
+      socket.off('checkStarted');
+      socket.off('tentStatusUpdated');
+      socket.off('checkCanceled');
     };
-  }, []); // Empty dependency array to run only once
+  }, []);
 
+  // Helper to format date/time
   const getCurrentDateTime = () => {
     const now = new Date();
-    const options = { month: 'numeric', day: 'numeric', year: 'numeric' };
-    const date = now.toLocaleDateString('en-US', options);
-    const time = now.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
+    const date = now.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+    const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
     return `${date} ${time}`;
   };
 
+  // Called when "Start Check" button is clicked
   const handleStartCheck = async () => {
     if (isCheckStarted) {
       alert('A check has already started.');
@@ -103,22 +103,23 @@ const TentCheck = () => {
     setTents(assignedTents);
     setIsCheckStarted(true);
 
-    // Instead of socket.emit, we call an API endpoint that triggers the Pusher event
+    // We call an API route, which on the backend triggers `io.emit('checkStarted', ...)`
     try {
       await axios.post(`${API_BASE_URL}/api/start-check`, {
         tents: assignedTents,
-        numCheckers,
-      });
+        numCheckers
+      }, { withCredentials: true });
       alert('Check started!');
     } catch (error) {
       console.error('Error starting check:', error);
     }
   };
 
+  // Called when "Cancel Check" button is clicked
   const handleCancelCheck = async () => {
     try {
-      await axios.post(`${API_BASE_URL}/api/cancel-check`);
-      // No need to manually set state here if the Pusher event handles it, but we do just in case
+      await axios.post(`${API_BASE_URL}/api/cancel-check`, {}, { withCredentials: true });
+      // The backend triggers 'checkCanceled' for all clients
       setIsCheckStarted(false);
       setTents([]);
       setCurrentPage(0);
@@ -129,6 +130,7 @@ const TentCheck = () => {
     }
   };
 
+  // Toggle user selection in a tent
   const toggleSelection = (tentId, member) => {
     setSelectedMembers((prevSelected) => {
       const selectedInTent = prevSelected[tentId] || [];
@@ -146,6 +148,7 @@ const TentCheck = () => {
     });
   };
 
+  // Called when the "How many checkers?" input changes
   const handleNumCheckersChange = (e) => {
     if (isCheckStarted) {
       alert('Cannot change number of checkers during an active check');
@@ -156,11 +159,13 @@ const TentCheck = () => {
     localStorage.setItem('numCheckers', newNumCheckers);
   };
 
+  // Switch between pages (groupIndex)
   const handlePageChange = (pageIndex) => {
     setCurrentPage(pageIndex);
     localStorage.setItem('currentPage', pageIndex);
   };
 
+  // Mark a tent as Miss
   const handleMiss = async (tentId) => {
     try {
       const tent = tents.find((t) => t.id === tentId);
@@ -169,9 +174,10 @@ const TentCheck = () => {
         return;
       }
 
-      const lastMissLM = 'user'; // Replace with actual user info if needed
+      const lastMissLM = 'user'; // Replace with actual user if needed
       const dateOfLastMiss = getCurrentDateTime();
 
+      // Add a CSS class for a removal animation
       document.getElementById(`tent-${tentId}`).classList.add('removing');
 
       setTimeout(async () => {
@@ -179,15 +185,16 @@ const TentCheck = () => {
           id: tentId,
           misses: (tent.numberOfMisses || 0) + 1,
           lastMissLM,
-          dateOfLastMiss,
-        });
-        // The backend triggers 'tentStatusUpdated' via Pusher, so no need for socket.emit
+          dateOfLastMiss
+        }, { withCredentials: true });
+        // The backend triggers 'tentStatusUpdated' after updating
       }, 500);
     } catch (error) {
       console.error('Error marking miss:', error);
     }
   };
 
+  // Mark a tent as Make
   const handleMake = async (tentId) => {
     const madeMembers = selectedMembers[tentId] || [];
     const dateOfLastCheck = getCurrentDateTime();
@@ -199,19 +206,21 @@ const TentCheck = () => {
         await axios.post(`${API_BASE_URL}/api/tent-checks/update`, {
           id: tentId,
           lastCheck: madeMembers.join(', ') || 'No members selected',
-          dateOfLastCheck,
-        });
-        // The backend triggers 'tentStatusUpdated' via Pusher
+          dateOfLastCheck
+        }, { withCredentials: true });
+        // The backend triggers 'tentStatusUpdated' after updating
       }, 500);
     } catch (error) {
       console.error('Error marking make:', error);
     }
   };
 
+  // Filter tents by groupIndex (the current "page")
   const tentsInCurrentPage = tents.filter((tent) => tent.groupIndex === currentPage);
 
   return (
     <div className="tent-check">
+      {/* If check not started, show the "Start Check" UI */}
       {!isCheckStarted ? (
         <div className="start-check">
           <h2>Start Tent Check</h2>
@@ -226,6 +235,7 @@ const TentCheck = () => {
           <button onClick={handleStartCheck}>Start Check</button>
         </div>
       ) : (
+        // If check is started, show the pagination and tent list
         <div>
           <button className="cancel-check" onClick={handleCancelCheck}>
             Cancel Check
@@ -251,7 +261,9 @@ const TentCheck = () => {
                 {tent.members.split(',').map((member) => (
                   <li
                     key={member.trim()}
-                    className={selectedMembers[tent.id]?.includes(member.trim()) ? 'selected' : ''}
+                    className={
+                      selectedMembers[tent.id]?.includes(member.trim()) ? 'selected' : ''
+                    }
                     onClick={() => toggleSelection(tent.id, member.trim())}
                   >
                     {member.trim()}
