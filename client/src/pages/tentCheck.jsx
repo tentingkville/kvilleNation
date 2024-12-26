@@ -3,7 +3,6 @@ import { io } from 'socket.io-client';  // <-- Import from socket.io-client
 import axios from 'axios';
 import '../styles/tentCheck.css'; 
 
-// The URL of your deployed backend (e.g., https://your-backend.com)
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Initialize Socket.IO client with the backend URL
