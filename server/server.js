@@ -58,10 +58,10 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URL,
-      ttl: 14 * 24 * 60 * 60,
+      ttl: 14 * 24 * 60 * 60, // 14 days
     }),
     cookie: {
-      secure: false, // true if HTTPS
+      secure: process.env.NODE_ENV === 'production', // Set true for HTTPS
       httpOnly: true,
     },
   })

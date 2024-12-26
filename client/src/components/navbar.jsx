@@ -56,11 +56,10 @@ export default function Navbar() {
                     {user.isLineMonitor && (
                         <>
                             <NavLink to="/tent-check" className="nav-link" activeClassName="active">Tent Check</NavLink>
-                            <NavLink to="/form" className="nav-link" activeClassName="active">Form</NavLink>
                         </>
                     )}
                     {user.isSuperUser && (
-                        <NavLink to="/lm-dashboard" className="nav-link" activeClassName="active">LM Dashboard</NavLink>
+                        <NavLink to="/line-monitor-dashboard" className="nav-link" activeClassName="active">LM Dashboard</NavLink>
                     )}
                     {/* Render Profile/Sign In only in the dropdown for mobile */}
                     {isNavExpanded && (
