@@ -62,22 +62,23 @@ const Login = () => {
       if (response.ok) {
         displaySuccessAlert(isRegistering ? 'Registration successful!' : 'Login successful!');
         if (isRegistering) {
-          setIsRegistering(false);
-          setFormData({ netID: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
+            setIsRegistering(false);
+            setFormData({ netID: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
         } else {
-          // Store JWT in localStorage
-          localStorage.setItem('token', data.token);
-
-          setUser({
-            isAuthenticated: true,
-            isLineMonitor: data.isLineMonitor,
-            isSuperUser: data.isSuperUser,
-          });
-          navigate('/profile');
+            setUser({
+                isAuthenticated: true,
+                isLineMonitor: data.isLineMonitor,
+                isSuperUser: data.isSuperUser,
+                firstName: data.firstName,   // Set firstName
+                lastName: data.lastName,     // Set lastName
+                email: data.email,           // Set email
+            });
+            localStorage.setItem('token', data.token); // Save token to localStorage
+            navigate('/profile');
         }
-      } else {
+    } else {
         displayErrorAlert(data.error || 'An error occurred. Please try again.');
-      }
+    }
     } catch (error) {
       displayErrorAlert('An unexpected error occurred. Please try again later.');
     }
@@ -91,14 +92,16 @@ const Login = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('token'); // Clear token
     setUser({
       isAuthenticated: false,
       isLineMonitor: false,
       isSuperUser: false,
+      firstName: null,
+      lastName: null,
+      email: null,
     });
-
-    navigate('/');
+    navigate('/login');
   };
 
   return (

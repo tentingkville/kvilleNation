@@ -1,14 +1,14 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import './navbar.css';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { IoIosArrowDropdown, IoIosCloseCircleOutline } from 'react-icons/io';
-import UserContext from '../userContext';
+import { useUser } from '../userContext'; // Import the custom hook
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
 export default function Navbar() {
     const [isNavExpanded, setIsNavExpanded] = useState(false);
-    const { user, setUser } = useContext(UserContext);
+    const { user, setUser } = useUser(); // Use the custom hook for user context
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -16,9 +16,9 @@ export default function Navbar() {
             const response = await fetch(`${API_BASE_URL}/api/profile/logout`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                credentials: 'include'
+                credentials: 'include',
             });
 
             if (response.ok) {
@@ -26,20 +26,26 @@ export default function Navbar() {
                     isAuthenticated: false,
                     isLineMonitor: false,
                     isSuperUser: false,
+                    firstName: null,
+                    lastName: null,
+                    email: null,
                 });
+                localStorage.removeItem('token'); // Clear the token
                 navigate('/login');
             } else {
-                const error = await response.text();
-                console.error('Logout failed:', error);
+                const error = await response.json();
+                console.error('Logout failed:', error.message);
             }
         } catch (error) {
-            console.error('Logout request error:', error);
+            console.error('Logout request error:', error.message);
         }
     };
 
     return (
-        <nav className='nav'>
-            <NavLink to="/" className="nav-link app-name">KVILLENATION</NavLink>
+        <nav className="nav">
+            <NavLink to="/" className="nav-link app-name">
+                KVILLENATION
+            </NavLink>
             <div className="nav-section left">
                 <button
                     className="nav-toggle"
@@ -49,23 +55,32 @@ export default function Navbar() {
                     {isNavExpanded ? <IoIosCloseCircleOutline /> : <IoIosArrowDropdown />}
                 </button>
                 <div className={`nav-menu ${isNavExpanded ? 'show' : ''}`}>
-                    <NavLink to="/history" className="nav-link" activeClassName="active">History</NavLink>
-                    <NavLink to="/policy" className="nav-link" activeClassName="active">Policy</NavLink>
-                    <NavLink to="/calendar" className="nav-link" activeClassName="active">Calendar</NavLink>
-                    <NavLink to="/line-monitors" className="nav-link" activeClassName="active">Line Monitors</NavLink>
+                    <NavLink to="/history" className="nav-link" activeClassName="active">
+                        History
+                    </NavLink>
+                    <NavLink to="/policy" className="nav-link" activeClassName="active">
+                        Policy
+                    </NavLink>
+                    <NavLink to="/calendar" className="nav-link" activeClassName="active">
+                        Calendar
+                    </NavLink>
+                    <NavLink to="/line-monitors" className="nav-link" activeClassName="active">
+                        Line Monitors
+                    </NavLink>
                     {user.isLineMonitor && (
-                        <>
-                            <NavLink to="/tent-check" className="nav-link" activeClassName="active">Tent Check</NavLink>
-                        </>
+                        <NavLink to="/tent-check" className="nav-link" activeClassName="active">
+                            Tent Check
+                        </NavLink>
                     )}
                     {user.isSuperUser && (
-                        <NavLink to="/line-monitor-dashboard" className="nav-link" activeClassName="active">LM Dashboard</NavLink>
+                        <NavLink to="/line-monitor-dashboard" className="nav-link" activeClassName="active">
+                            LM Dashboard
+                        </NavLink>
                     )}
-                    {/* Render Profile/Sign In only in the dropdown for mobile */}
                     {isNavExpanded && (
-                        <NavLink 
-                            to={user.isAuthenticated ? "/profile" : "/login"} 
-                            className="nav-link mobile-profile-link" 
+                        <NavLink
+                            to={user.isAuthenticated ? "/profile" : "/login"}
+                            className="nav-link mobile-profile-link"
                             activeClassName="active"
                         >
                             {user.isAuthenticated ? "Profile" : "Sign In"}
@@ -75,16 +90,17 @@ export default function Navbar() {
             </div>
             {!isNavExpanded && (
                 <div className="nav-section right">
-                    {/* Render Profile/Sign In only for desktop */}
-                    <NavLink 
-                        to={user.isAuthenticated ? "/profile" : "/login"} 
-                        className="nav-link profile-link" 
+                    <NavLink
+                        to={user.isAuthenticated ? "/profile" : "/login"}
+                        className="nav-link profile-link"
                         activeClassName="active"
                     >
-                        {user.isAuthenticated ? "Profile" : "Sign In"}
+                        {user.isAuthenticated ? `Hello, ${user.firstName || "User"}` : "Sign In"}
                     </NavLink>
                     {user.isAuthenticated && (
-                        <button onClick={handleLogout} className="nav-link logout-button">Logout</button>
+                        <button onClick={handleLogout} className="nav-link logout-button">
+                            Logout
+                        </button>
                     )}
                 </div>
             )}

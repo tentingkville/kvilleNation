@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const UserContext = createContext();
 
@@ -9,19 +9,17 @@ export const UserProvider = ({ children }) => {
     isAuthenticated: false,
     isLineMonitor: false,
     isSuperUser: false,
+    firstName: null,
+    lastName: null,
+    email: null,
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const rehydrateUser = async () => {
       const token = localStorage.getItem('token');
 
       if (!token) {
-        setUser({
-          isAuthenticated: false,
-          isLineMonitor: false,
-          isSuperUser: false,
-        });
         setLoading(false);
         return;
       }
@@ -31,7 +29,7 @@ export const UserProvider = ({ children }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`, // Include token
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -41,20 +39,21 @@ export const UserProvider = ({ children }) => {
             isAuthenticated: true,
             isLineMonitor: data.isLineMonitor,
             isSuperUser: data.isSuperUser,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
           });
         } else {
-          console.error('Token verification failed');
           localStorage.removeItem('token'); // Clear invalid token
         }
       } catch (error) {
-        console.error('Error verifying token:', error);
         localStorage.removeItem('token'); // Clear invalid token
       } finally {
         setLoading(false);
       }
     };
 
-    checkAuth();
+    rehydrateUser();
   }, []);
 
   if (loading) {
@@ -68,15 +67,9 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-// Export useUser hook for consuming the context
+// Create a custom hook for accessing UserContext
 export const useUser = () => {
-  const context = useContext(UserContext);
-
-  if (!context) {
-    throw new Error('useUser must be used within a UserProvider');
-  }
-
-  return context;
+  return useContext(UserContext);
 };
 
 export default UserContext;
