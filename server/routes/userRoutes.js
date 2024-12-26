@@ -41,37 +41,43 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { netID, password } = req.body;
 
+  // Validation: Ensure required fields are provided
   if (!netID || !password) {
     return res.status(400).json({ error: 'NetID and password are required' });
   }
 
   try {
+    // Check if user exists in the database
     const user = await kvilleProfiles.findOne({ netID });
     if (!user) {
-      return res.status(400).json({ error: 'User not found' });
+      // User does not exist
+      return res.status(404).json({ error: 'Account does not exist. Please register.' });
     }
 
+    // Compare provided password with stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid credentials' });
+      // Password mismatch
+      return res.status(401).json({ error: 'Incorrect password. Please try again.' });
     }
 
-    // Set session
+    // Set session data upon successful login
     req.session.user = {
       netID: user.netID,
       isLineMonitor: user.isLineMonitor,
       isSuperUser: user.isSuperUser,
     };
-    console.log('User session:', req.session.user);
 
+    // Respond with success
     res.json({
       isAuthenticated: true,
       isLineMonitor: user.isLineMonitor,
       isSuperUser: user.isSuperUser,
     });
   } catch (error) {
-    console.error('Error in login:', error.message);
-    res.status(500).json({ error: 'Internal server error' });
+    // Catch unexpected errors
+    console.error('Error during login:', error.message);
+    res.status(500).json({ error: 'Internal server error. Please try again later.' });
   }
 });
 

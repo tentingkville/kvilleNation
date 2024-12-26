@@ -6,6 +6,7 @@ import UserContext from '../userContext.js';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
+
 const Login = () => {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext); // Get the setUser function from context
@@ -21,6 +22,8 @@ const Login = () => {
 
   const [successAlert, setSuccessAlert] = useState({ show: false, message: '' });
   const [errorAlert, setErrorAlert] = useState({ show: false, message: '' });
+  const [fadeOutSuccess, setFadeOutSuccess] = useState(false);
+  const [fadeOutError, setFadeOutError] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,37 +31,41 @@ const Login = () => {
 
   const displaySuccessAlert = (message) => {
     setSuccessAlert({ show: true, message });
-    setTimeout(() => setSuccessAlert({ show: false, message: '' }), 5000); // Automatically hide after 5 seconds
+    setTimeout(() => {
+      setSuccessAlert({ show: false, message: '' });
+    }, 5000); 
   };
-
+  
   const displayErrorAlert = (message) => {
     setErrorAlert({ show: true, message });
-    setTimeout(() => setErrorAlert({ show: false, message: '' }), 5000); // Automatically hide after 5 seconds
+    setTimeout(() => {
+      setErrorAlert({ show: false, message: '' });
+    }, 5000); 
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = `${API_BASE_URL}/api/profile/${isRegistering ? 'register' : 'login'}`;
     const { netID, email, firstName, lastName, password, confirmPassword } = formData;
-
+  
     if (isRegistering && password !== confirmPassword) {
       displayErrorAlert('Passwords do not match');
       return;
     }
-
+  
     const body = isRegistering ? { netID, email, firstName, lastName, password } : { netID, password };
-
+  
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-        credentials: 'include' // Include credentials (cookies)
+        credentials: 'include', // Include credentials (cookies)
       });
-      const data = await response.json(); // Assuming the server returns JSON data
-
+  
+      const data = await response.json();
+  
       if (response.ok) {
         displaySuccessAlert(isRegistering ? 'Registration successful!' : 'Login successful!');
         if (isRegistering) {
@@ -73,10 +80,11 @@ const Login = () => {
           navigate('/profile');
         }
       } else {
-        throw new Error(data.message || 'Something went wrong');
+        // Display detailed error from the server response
+        displayErrorAlert(data.error || 'An error occurred. Please try again.');
       }
     } catch (error) {
-      displayErrorAlert(error.message);
+      displayErrorAlert('An unexpected error occurred. Please try again later.');
     }
   };
 
@@ -118,8 +126,16 @@ const Login = () => {
     <div className="login-page">
       <div className={`form-container ${isRegistering ? 'register-container' : ''}`}>
         <h2>{isRegistering ? 'Register' : 'Login'}</h2>
-        {successAlert.show && <Alert variant="success">{successAlert.message}</Alert>}
-        {errorAlert.show && <Alert variant="danger">{errorAlert.message}</Alert>}
+        {successAlert.show && (
+          <div className={`alert alert-success ${fadeOutSuccess ? 'alert-hidden' : 'alert-visible'}`}>
+            {successAlert.message}
+          </div>
+        )}
+        {errorAlert.show && (
+          <div className={`alert alert-error ${fadeOutError ? 'alert-hidden' : 'alert-visible'}`}>
+            {errorAlert.message}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <input type="text" name="netID" placeholder="NetID" value={formData.netID} onChange={handleChange} required />
           {isRegistering && (
