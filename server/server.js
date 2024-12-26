@@ -10,7 +10,6 @@ const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 
 mongoose.connect(process.env.MONGO_URL, {
-  useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
@@ -240,10 +239,7 @@ app.use('/api/profile', UserRoute);
 /**
  * START THE SERVER IF LOCAL
  */
-// const PORT = process.env.PORT || 8081;
-// server.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
-
-// use this for deployment
-module.exports = app;
+const PORT = process.env.PORT || 8081;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
