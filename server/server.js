@@ -27,21 +27,25 @@ mongoose.connection.on('error', (err) => {
 const app = express();
 const server = http.createServer(app);
 
-// Allowed Origins
-const allowedOrigins = ['http://localhost:3000', 'https://kville-nation-frontend.vercel.app', 'https://kvillenation.com', 'https://www.kvillenation.com'];
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://kville-nation-frontend.vercel.app',
+  'https://kvillenation.com',
+  'https://www.kvillenation.com',
+];
 
-// CORS Middleware
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests from listed origins or from no origin (e.g., server-to-server)
+      console.log(`Origin: ${origin}`); // Log origin for debugging
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        console.error(`CORS error: ${origin} is not allowed`);
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
       }
     },
-    credentials: true,
+    credentials: true, // Allow cookies and credentials
   })
 );
 app.use(express.json());
