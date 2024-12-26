@@ -14,7 +14,6 @@ import TentCheck from './pages/tentCheck.jsx';
 import LmDashboard from './pages/lmDashboard.jsx';
 import { UserProvider, useUser } from './userContext.js';
 
-
 // Function to protect routes
 function ProtectedRoute({ children }) {
   const { user } = useUser();

@@ -6,7 +6,6 @@ import UserContext from '../userContext.js';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
-
 const Login = () => {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext); // Get the setUser function from context
@@ -22,8 +21,6 @@ const Login = () => {
 
   const [successAlert, setSuccessAlert] = useState({ show: false, message: '' });
   const [errorAlert, setErrorAlert] = useState({ show: false, message: '' });
-  const [fadeOutSuccess, setFadeOutSuccess] = useState(false);
-  const [fadeOutError, setFadeOutError] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,29 +28,26 @@ const Login = () => {
 
   const displaySuccessAlert = (message) => {
     setSuccessAlert({ show: true, message });
-    setTimeout(() => {
-      setSuccessAlert({ show: false, message: '' });
-    }, 5000); 
+    setTimeout(() => setSuccessAlert({ show: false, message: '' }), 5000); 
   };
-  
+
   const displayErrorAlert = (message) => {
     setErrorAlert({ show: true, message });
-    setTimeout(() => {
-      setErrorAlert({ show: false, message: '' });
-    }, 5000); 
+    setTimeout(() => setErrorAlert({ show: false, message: '' }), 5000); 
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = `${API_BASE_URL}/api/profile/${isRegistering ? 'register' : 'login'}`;
     const { netID, email, firstName, lastName, password, confirmPassword } = formData;
-  
+
     if (isRegistering && password !== confirmPassword) {
       displayErrorAlert('Passwords do not match');
       return;
     }
-  
+
     const body = isRegistering ? { netID, email, firstName, lastName, password } : { netID, password };
-  
+
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -61,17 +55,19 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-        credentials: 'include', // Include credentials (cookies)
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         displaySuccessAlert(isRegistering ? 'Registration successful!' : 'Login successful!');
         if (isRegistering) {
           setIsRegistering(false);
           setFormData({ netID: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
         } else {
+          // Store JWT in localStorage
+          localStorage.setItem('token', data.token);
+
           setUser({
             isAuthenticated: true,
             isLineMonitor: data.isLineMonitor,
@@ -80,7 +76,6 @@ const Login = () => {
           navigate('/profile');
         }
       } else {
-        // Display detailed error from the server response
         displayErrorAlert(data.error || 'An error occurred. Please try again.');
       }
     } catch (error) {
@@ -95,47 +90,23 @@ const Login = () => {
     setErrorAlert({ show: false, message: '' });
   };
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/profile/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include' // Include credentials (cookies)
-      });
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUser({
+      isAuthenticated: false,
+      isLineMonitor: false,
+      isSuperUser: false,
+    });
 
-      if (response.ok) {
-        // Clear user context or state
-        setUser({
-          isAuthenticated: false,
-          isLineMonitor: false,
-          isSuperUser: false,
-        });
-        navigate('/'); // Redirect to home page or another appropriate page
-      } else {
-        const error = await response.text();
-        console.error('Logout failed:', error);
-      }
-    } catch (error) {
-      console.error('Logout request error:', error);
-    }
+    navigate('/');
   };
 
   return (
     <div className="login-page">
       <div className={`form-container ${isRegistering ? 'register-container' : ''}`}>
         <h2>{isRegistering ? 'Register' : 'Login'}</h2>
-        {successAlert.show && (
-          <div className={`alert alert-success ${fadeOutSuccess ? 'alert-hidden' : 'alert-visible'}`}>
-            {successAlert.message}
-          </div>
-        )}
-        {errorAlert.show && (
-          <div className={`alert alert-error ${fadeOutError ? 'alert-hidden' : 'alert-visible'}`}>
-            {errorAlert.message}
-          </div>
-        )}
+        {successAlert.show && <Alert variant="success">{successAlert.message}</Alert>}
+        {errorAlert.show && <Alert variant="danger">{errorAlert.message}</Alert>}
         <form onSubmit={handleSubmit}>
           <input type="text" name="netID" placeholder="NetID" value={formData.netID} onChange={handleChange} required />
           {isRegistering && (
@@ -148,24 +119,20 @@ const Login = () => {
             </>
           )}
           {!isRegistering && (
-            <>
-              <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
-            </>
+            <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
           )}
           <button type="submit">{isRegistering ? 'Register' : 'Login'}</button>
         </form>
         {isRegistering ? (
           <p>
-            Already have an account? <span onClick={switchMode} style={{ cursor: 'pointer'}}>Login</span>
+            Already have an account? <span onClick={switchMode} style={{ cursor: 'pointer' }}>Login</span>
           </p>
         ) : (
           <p>
-            Don't have an account? <span onClick={switchMode} style={{ cursor: 'pointer'}}>Register</span>
+            Don't have an account? <span onClick={switchMode} style={{ cursor: 'pointer' }}>Register</span>
           </p>
         )}
-        {user.isAuthenticated && (
-          <button onClick={handleLogout} className="nav-link">Logout</button>
-        )}
+        {user.isAuthenticated && <button onClick={handleLogout} className="nav-link">Logout</button>}
       </div>
     </div>
   );

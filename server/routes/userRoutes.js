@@ -2,96 +2,86 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const kvilleProfiles = require('../models/profileModel');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const authenticateToken = require('../middleware/authenticateToken'); // Import middleware
 
-// Registration route
-router.post('/register', async (req, res) => {
-  const { netID, email, firstName, lastName, password } = req.body;
-
-  if (!netID || !email || !firstName || !lastName || !password) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
-
-  try {
-    const existingUser = await kvilleProfiles.findOne({ netID });
-    if (existingUser) {
-      return res.status(400).json({ error: 'NetID already exists' });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = new kvilleProfiles({
-      netID,
-      email,
-      firstName,
-      lastName,
-      password: hashedPassword,
-      isLineMonitor: false,
-      isSuperUser: false,
+router.get('/profile', authenticateToken, (req, res) => {
+    res.json({
+        netID: req.user.netID,
+        isLineMonitor: req.user.isLineMonitor,
+        isSuperUser: req.user.isSuperUser,
     });
-
-    await newUser.save();
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    console.error('Error in registration:', error.message);
-    res.status(500).json({ error: 'Internal server error' });
-  }
 });
+router.post('/register', async (req, res) => {
+    const { netID, email, firstName, lastName, password } = req.body;
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new kvilleProfiles({
+            netID,
+            email,
+            firstName,
+            lastName,
+            password: hashedPassword,
+            isLineMonitor: false,
+            isSuperUser: false
+        });
+
+        await newUser.save();
+        res.status(201).send('User registered successfully');
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
 // Login route
 router.post('/login', async (req, res) => {
-  const { netID, password } = req.body;
+    const { netID, password } = req.body;
 
-  // Validation: Ensure required fields are provided
-  if (!netID || !password) {
-    return res.status(400).json({ error: 'NetID and password are required' });
-  }
-
-  try {
-    // Check if user exists in the database
-    const user = await kvilleProfiles.findOne({ netID });
-    if (!user) {
-      // User does not exist
-      return res.status(404).json({ error: 'Account does not exist. Please register.' });
+    if (!netID || !password) {
+        return res.status(400).send('NetID and password are required');
     }
 
-    // Compare provided password with stored hashed password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      // Password mismatch
-      return res.status(401).json({ error: 'Incorrect password. Please try again.' });
-    }
-
-    // Set session data upon successful login
-    req.session.user = {
-      netID: user.netID,
-      isLineMonitor: user.isLineMonitor,
-      isSuperUser: user.isSuperUser,
-    };
-
-    // Respond with success
-    res.json({
-      isAuthenticated: true,
-      isLineMonitor: user.isLineMonitor,
-      isSuperUser: user.isSuperUser,
-    });
-  } catch (error) {
-    // Catch unexpected errors
-    console.error('Error during login:', error.message);
-    res.status(500).json({ error: 'Internal server error. Please try again later.' });
-  }
-});
-
-router.post('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            console.error('Session destruction error:', err);
-            return res.status(500).send('Failed to log out');
+    try {
+        const user = await kvilleProfiles.findOne({ netID });
+        if (!user) {
+            return res.status(400).send('User not found');
         }
-        res.clearCookie('connect.sid'); 
-        res.send('User logged out successfully');
-    });
-});
 
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).send('Invalid credentials');
+        }
+
+        // Generate JWT
+        const token = jwt.sign(
+            {
+                netID: user.netID,
+                isLineMonitor: user.isLineMonitor,
+                isSuperUser: user.isSuperUser,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '4d' }
+        );
+
+        // Send the response
+        return res.json({
+            token,
+            isLineMonitor: user.isLineMonitor,
+            isSuperUser: user.isSuperUser,
+        });
+    } catch (error) {
+        console.error('Error during login:', error.message);
+        return res.status(500).send('Internal server error');
+    }
+});
+// Logout route
+router.post('/logout', authenticateToken, (req, res) => {
+    res.clearCookie('token');
+    res.send('User logged out successfully');
+});
 router.get('/check-auth', (req, res) => {
     console.log('Received request on /check-auth');
     console.log('Session data:', req.session);
@@ -104,6 +94,25 @@ router.get('/check-auth', (req, res) => {
     } else {
         res.json({ isAuthenticated: false });
     }
+});
+router.post('/verify-token', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).send({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.send({
+      isAuthenticated: true,
+      isLineMonitor: decoded.isLineMonitor,
+      isSuperUser: decoded.isSuperUser,
+    });
+  } catch (error) {
+    console.error('Error verifying token:', error);
+    res.status(401).send({ error: 'Invalid token' });
+  }
 });
 
 module.exports = router;

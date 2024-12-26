@@ -1,6 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 
-// Create the UserContext
 const UserContext = createContext();
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -14,37 +13,42 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Function to check user authentication status
     const checkAuth = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/profile/check-auth`, {
-          method: 'GET',
-          credentials: 'include', // Include cookies for session handling
-        });
+      const token = localStorage.getItem('token');
 
-        if (!response.ok) {
-          console.warn(`Authentication check failed: ${response.status} ${response.statusText}`);
-          setUser({
-            isAuthenticated: false,
-            isLineMonitor: false,
-            isSuperUser: false,
-          });
-          return;
-        }
-
-        const data = await response.json();
-        setUser({
-          isAuthenticated: data.isAuthenticated,
-          isLineMonitor: data.isLineMonitor || false,
-          isSuperUser: data.isSuperUser || false,
-        });
-      } catch (error) {
-        console.error('Error checking authentication status:', error);
+      if (!token) {
         setUser({
           isAuthenticated: false,
           isLineMonitor: false,
           isSuperUser: false,
         });
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/profile/verify-token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Include token
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser({
+            isAuthenticated: true,
+            isLineMonitor: data.isLineMonitor,
+            isSuperUser: data.isSuperUser,
+          });
+        } else {
+          console.error('Token verification failed');
+          localStorage.removeItem('token'); // Clear invalid token
+        }
+      } catch (error) {
+        console.error('Error verifying token:', error);
+        localStorage.removeItem('token'); // Clear invalid token
       } finally {
         setLoading(false);
       }
@@ -53,7 +57,6 @@ export const UserProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  // Show a loading indicator while authentication status is being fetched
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -65,6 +68,15 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-export const useUser = () => React.useContext(UserContext);
+// Export useUser hook for consuming the context
+export const useUser = () => {
+  const context = useContext(UserContext);
+
+  if (!context) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+
+  return context;
+};
 
 export default UserContext;
