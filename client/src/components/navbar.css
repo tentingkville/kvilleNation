@@ -17,6 +17,7 @@
   width: 100%;
   z-index: 1000;
 }
+
 .nav-link.app-name {
   font-weight: bold;
   font-size: 1.5em;
@@ -61,6 +62,7 @@
   left: 0;
   right: 0;
 }
+
 .nav-section.right {
   margin-left: auto; /* Pushes right section to the far right */
   display: flex;
@@ -107,6 +109,15 @@
     padding: 10px 20px;
     width: 100%;
     text-align: left;
+  }
+
+  .nav-section.left .nav-menu.show .logout-button {
+    padding: 10px 20px;
+    text-align: left;
+    width: 100%;
+    background-color: #002b7f;
+    border: none;
+    color: white;
   }
 
   .nav-toggle {
