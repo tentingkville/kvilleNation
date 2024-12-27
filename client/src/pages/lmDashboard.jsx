@@ -64,7 +64,7 @@ const LmDashboard = () => {
         },
         body: JSON.stringify({
           netID,
-          role: field,
+          field,
           value: newValue,
         }),
       });
