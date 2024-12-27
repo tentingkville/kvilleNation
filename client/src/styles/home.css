@@ -102,12 +102,13 @@
     height: auto;
   }
   .register-button {
-    padding: 10px auto;
-    width: auto;
+    padding: 20px;
+    width: 100%;
   }
   .bubble-container {
-    max-width: 100%;
     margin: 10px 0;
+    width: 100%;
+
   }
   .stats-row, .stat-box {
     flex-direction: column;
