@@ -48,49 +48,49 @@ router.post('/register', async (req, res) => {
 });
 // Login route
 router.post('/login', async (req, res) => {
-    const { netID, password } = req.body;
+  const { netID, password } = req.body;
 
-    if (!netID || !password) {
-        return res.status(400).send('NetID and password are required');
+  if (!netID || !password) {
+    return res.status(400).json({ error: 'NetID and password are required' });
+  }
+
+  try {
+    const user = await kvilleProfiles.findOne({ netID });
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
     }
 
-    try {
-        const user = await kvilleProfiles.findOne({ netID });
-        if (!user) {
-            return res.status(400).send('User not found');
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).send('Invalid credentials');
-        }
-
-        const token = jwt.sign(
-            {
-                netID: user.netID,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                isLineMonitor: user.isLineMonitor,
-                isSuperUser: user.isSuperUser,
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: '4d' }
-        );
-
-        // Send the token and user details
-        return res.json({
-            token,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            isLineMonitor: user.isLineMonitor,
-            isSuperUser: user.isSuperUser,
-        });
-    } catch (error) {
-        console.error('Error during login:', error.message);
-        return res.status(500).send('Internal server error');
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid credentials' });
     }
+
+    const token = jwt.sign(
+      {
+        netID: user.netID,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        isLineMonitor: user.isLineMonitor,
+        isSuperUser: user.isSuperUser,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '4d' }
+    );
+
+    // Send the token and user details on success
+    return res.json({
+      token,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      isLineMonitor: user.isLineMonitor,
+      isSuperUser: user.isSuperUser,
+    });
+  } catch (error) {
+    console.error('Error during login:', error.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 // Logout route
 router.post('/logout', (req, res) => {
