@@ -93,7 +93,10 @@ io.on('connection', (socket) => {
 
   // (Optional) If you want to emit the current check status to new connections:
   if (isCheckInProgress) {
-    socket.emit('checkStarted', activeTents);
+    socket.emit('checkStarted', {
+      activeTents,
+      numCheckers,
+    });
   }
 
   socket.on('disconnect', () => {
