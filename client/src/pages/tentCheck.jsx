@@ -48,7 +48,7 @@ const TentCheck = () => {
     fetchInitialData();
 
     // 2) Listen for real-time Socket.IO events
-    socket.on('checkStarted', (activeTents) => {
+    socket.on('checkStarted', ({activeTents, numCheckers}) => {
       setIsCheckStarted(true);
       setTents(activeTents);
       setNumCheckers(numCheckers);
