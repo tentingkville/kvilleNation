@@ -51,6 +51,9 @@ const TentCheck = () => {
     socket.on('checkStarted', (activeTents) => {
       setIsCheckStarted(true);
       setTents(activeTents);
+      setNumCheckers(numCheckers);
+      setCurrentPage(0);
+      localStorage.setItem('numCheckers', numCheckers);
     });
 
     socket.on('tentStatusUpdated', (data) => {

@@ -131,7 +131,10 @@ app.post('/api/start-check', (req, res) => {
   activeTents = assignedTents;
 
   // Broadcast via Socket.IO
-  io.emit('checkStarted', activeTents);
+  io.emit('checkStarted', {
+    activeTents,
+    numCheckers,
+  });
   console.log('A new check has started');
   return res.status(200).json({ success: true });
 });
