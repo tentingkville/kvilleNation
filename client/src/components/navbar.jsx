@@ -153,24 +153,36 @@ export default function Navbar() {
 
       {/* RIGHT SECTION (desktop-only) */}
       <div className="nav-section right">
-        {user.isAuthenticated ? (
-          <>
-            <span className="nav-link profile-text">
-              Hello, {user.firstName || 'User'}
-            </span>
-            <button onClick={handleLogout} className="nav-link logout-button">
-              Logout
-            </button>
-          </>
-        ) : (
-          <NavLink
-            to="/login"
-            className="nav-link"
-            activeClassName="active"
-          >
-            Sign In
-          </NavLink>
-        )}
+      {user.isAuthenticated ? (
+              <>
+                <NavLink
+                  to="/profile"
+                  className="nav-link"
+                  activeClassName="active"
+                  onClick={closeMenu}
+                >
+                  Hello, {user.firstName || 'User'}
+                </NavLink>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    closeMenu();
+                  }}
+                  className="nav-link logout-button"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <NavLink
+                to="/login"
+                className="nav-link"
+                activeClassName="active"
+                onClick={closeMenu}
+              >
+                Sign In
+              </NavLink>
+            )}
       </div>
     </nav>
   );
