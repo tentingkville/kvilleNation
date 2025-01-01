@@ -218,8 +218,7 @@ const TentCheck = () => {
   };
 
   // Filter tents by groupIndex (the current "page")
-  const tentsInCurrentPage = tents.filter((tent) => tent.groupIndex === currentPage);
-
+  const tentsInCurrentPage = tents.filter(tent => tent.groupIndex === currentPage);
   return (
     <div className="tent-check">
       {/* If check not started, show the "Start Check" UI */}
