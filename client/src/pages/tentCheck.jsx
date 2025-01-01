@@ -89,9 +89,15 @@ const TentCheck = () => {
       alert('A check has already started.');
       return;
     }
+    // Re-fetch here if desired (only if not isCheckStarted)
+    const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
+      withCredentials: true
+    });
+    const sortedTents = tentsResponse.data.sort((a, b) => a.order - b.order);
 
-    const chunkSize = Math.ceil(tents.length / numCheckers);
-    let assignedTents = [...tents];
+
+    const chunkSize = Math.ceil(sortedTents.length / numCheckers);
+    let assignedTents = [...sortedTents];
 
     for (let i = 0; i < numCheckers; i++) {
       const start = i * chunkSize;
