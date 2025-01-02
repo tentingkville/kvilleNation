@@ -20,6 +20,8 @@ export default function TentCheck() {
   // total pages = actual checkers + 1 for the "Duke Card Checker"
 const totalPages = numCheckers + 1;
 const isDukeCardPage = (currentPage === numCheckers);
+const [dukeSearchTerm, setDukeSearchTerm] = useState('');
+
   // 1) On mount: fetch data, listen to sockets
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -322,7 +324,14 @@ const isDukeCardPage = (currentPage === numCheckers);
             <div className="duke-card-checker">
               <h2>Duke Card Checker</h2>
               <p>Select names to exclude (they will appear 'excluded' on other pages)</p>
-              
+              <div className="search-bar">
+                <input
+                  type="text"
+                  placeholder="Search members..."
+                  value={dukeSearchTerm}
+                  onChange={(e) => setDukeSearchTerm(e.target.value)}
+                />
+              </div>
               {/* Flatten all members from all tents into one list */}
               <ul>
                 {allMembers.map((name) => {

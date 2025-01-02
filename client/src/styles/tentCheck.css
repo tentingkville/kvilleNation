@@ -1,4 +1,4 @@
-/* General Layout */
+/* General Layout & Container */
 .tent-check {
   font-family: 'Roboto', Arial, sans-serif;
   margin: 20px auto;
@@ -10,13 +10,15 @@
   border: 1px solid #d1d9e6;
 }
 
-/* Heading */
+/* Heading inside the container */
 .tent-check h2 {
   color: #001A57; /* Duke Blue */
   text-align: center;
   margin-bottom: 15px;
   font-size: 28px;
   font-weight: bold;
+
+  /* Faux gradient text effect */
   background: linear-gradient(to right, #001A57, #003366);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -34,7 +36,7 @@
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
-  gap: 8px;
+  gap: 8px; /* spacing between buttons */
 }
 
 .pagination button {
@@ -49,17 +51,20 @@
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
+/* Active (current) page */
 .pagination button.active {
   background-color: #cdd7e6; /* Light grayish blue */
   color: #001A57; /* Duke Blue for text */
-  border: 1px solid #001A57; /* Duke Blue border for distinction */
+  border: 1px solid #001A57; /* Distinct border */
 }
 
+/* Non-active pages */
 .pagination button:not(.active) {
   background-color: #001A57; /* Duke Blue for non-active */
   color: white;
 }
 
+/* Hover effects on pagination */
 .pagination button:hover {
   opacity: 0.9;
   transform: translateY(-2px);
@@ -86,7 +91,7 @@
   animation: fadeOutShrink 0.5s ease forwards;
 }
 
-/* Tent disappears with fade-out and scale-down */
+/* Keyframe: fade out & scale down */
 @keyframes fadeOutShrink {
   0% {
     opacity: 1;
@@ -98,7 +103,7 @@
   }
 }
 
-/* Tent Details */
+/* Tent Details: Titles & Paragraphs */
 .tent-card h2 {
   color: #001A57; /* Duke Blue */
   font-size: 24px;
@@ -136,13 +141,22 @@
   background-color: #e0e7f1;
 }
 
+/* If a member is selected */
 .members-list li.selected {
-  background-color: #001A57; /* Duke Blue for selected */
+  background-color: #001A57; /* Duke Blue */
   color: white;
   border-color: #001A57;
 }
 
-/* Buttons */
+/* 'excluded' class for hidden/blocked members */
+.excluded {
+  color: gray;
+  text-decoration: line-through;
+  pointer-events: none; /* optional to disable clicking */
+  opacity: 0.6;
+}
+
+/* Buttons & Actions */
 .actions {
   display: flex;
   justify-content: center;
@@ -165,6 +179,7 @@
   transform: translateY(-2px);
 }
 
+/* Miss/Make Buttons */
 .actions button:first-of-type {
   background-color: #ff4d4d; /* Red for Miss */
 }
@@ -221,7 +236,7 @@
 
 .start-check input[type="number"]:focus {
   outline: none;
-  border-color: #001A57; /* Duke Blue */
+  border-color: #001A57;
 }
 
 .start-check button {
@@ -240,14 +255,71 @@
   background-color: #434aa8; /* Darker shade of blue */
   transform: scale(1.05);
 }
-.excluded {
-  color: gray;
-  text-decoration: line-through;
-  pointer-events: none; /* optional if you want them not clickable */
-  opacity: 0.6;         /* optional, make them faded */
+
+/* DUKE CARD CHECKER PAGE */
+.duke-card-checker {
+  background-color: #fefefe;
+  border: 1px solid #d1d9e6;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive Design */
+.duke-card-checker h2 {
+  color: #001A57;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.duke-card-checker p {
+  text-align: center;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+/* (Optional) Search bar for the Duke Card Checker page */
+.duke-card-checker .search-bar {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.duke-card-checker .search-bar input {
+  width: 60%;
+  max-width: 400px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.duke-card-checker ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.duke-card-checker ul li {
+  padding: 8px;
+  margin: 5px 0;
+  background-color: #f1f3f5;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.duke-card-checker ul li:hover {
+  background-color: #e2e6ea;
+}
+
+/* Responsive Design for smaller devices */
+
+/* Medium screens (≤768px) */
 @media screen and (max-width: 768px) {
   .tent-check {
     padding: 15px;
@@ -282,6 +354,7 @@
   }
 }
 
+/* Small screens (≤480px) */
 @media screen and (max-width: 480px) {
   .tent-check h2 {
     font-size: 20px;
