@@ -357,11 +357,18 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                     const isExcluded = excludedNames.includes(name);
                     return (
                       <li
-                        key={name}
-                        className={isExcluded ? 'excluded' : ''}
-                        onClick={() => toggleExcludedName(name)}
+                        key={member}
+                        className={
+                          isExcluded
+                            ? 'excluded'
+                            : isSelected
+                              ? 'selected'
+                              : ''
+                        }
+                        onClick={() => toggleSelection(tent.id, member)}
                       >
-                        {name} {isExcluded && '(excluded)'}
+                        {member} 
+                        {isSelected && ' (click to unselect)'}
                       </li>
                     );
                   })}
