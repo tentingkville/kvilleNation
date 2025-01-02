@@ -152,8 +152,11 @@
 .excluded {
   color: gray;
   text-decoration: line-through;
-  /* pointer-events: none; optional to disable clicking */
+  pointer-events: none; /* Disable hover & click */
   opacity: 0.6;
+}
+.duke-card-checker .excluded {
+  pointer-events: auto; /* Re-enable for the Duke Card Checker page */
 }
 
 /* Buttons & Actions */
