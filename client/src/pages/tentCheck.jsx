@@ -357,19 +357,19 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                     const isExcluded = excludedNames.includes(name);
                     return (
                       <li
-                        key={member}
-                        className={
-                          isExcluded
-                            ? 'excluded'
-                            : isSelected
-                              ? 'selected'
-                              : ''
-                        }
-                        onClick={() => toggleSelection(tent.id, member)}
-                      >
-                        {member} 
-                        {isSelected && ' (click to unselect)'}
-                      </li>
+                      key={member}
+                      className={
+                        isExcluded
+                          ? 'excluded'
+                          : isSelected
+                            ? 'selected'
+                            : ''
+                      }
+                      onClick={() => toggleSelection(tent.id, member)}
+                    >
+                      {member} 
+                      {isSelected && ' (click to unselect)'}
+                    </li>
                     );
                   })}
               </ul>
@@ -378,49 +378,49 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
             /* Normal checker pages (index < numCheckers). Filter tents by groupIndex */
             <div>
               {tentsInCurrentPage.map((tent) => (
-                <div key={tent.id} id={`tent-${tent.id}`} className="tent-card">
-                  <h2>Tent {tent.order}</h2>
-                  <p>
-                    <strong>Day Number:</strong> {tent.dayNumber}
-                  </p>
-                  <p>
-                    <strong>Night Number:</strong> {tent.nightNumber}
-                  </p>
-                  <ul className="members-list">
-                    {tent.members.split(',').map((rawMember) => {
-                      const member = rawMember.trim();
-                      const isExcluded = excludedNames.includes(member);
-                      const isSelected = selectedMembers[tent.id]?.includes(member);
-  
-                      return (
-                        <li
-                          key={member}
-                          className={
-                            isExcluded
-                              ? 'excluded'
-                              : isSelected
-                                ? 'selected'
-                                : ''
+              <div key={tent.id} id={`tent-${tent.id}`} className="tent-card">
+                <h2>Tent {tent.order}</h2>
+                <p><strong>Day Number:</strong> {tent.dayNumber}</p>
+                <p><strong>Night Number:</strong> {tent.nightNumber}</p>
+                
+                <ul className="members-list">
+                  {tent.members.split(',').map((rawMember) => {
+                    // Define variables in the correct scope
+                    const member = rawMember.trim();
+                    const isExcluded = excludedNames.includes(member);
+                    const isSelected = selectedMembers[tent.id]?.includes(member);
+
+                    return (
+                      <li
+                        key={member}
+                        className={
+                          isExcluded
+                            ? 'excluded'
+                            : isSelected
+                              ? 'selected'
+                              : ''
+                        }
+                        onClick=  {() => {
+                          if (!isExcluded) {
+                            toggleSelection(tent.id, member);
+                          } else {
+                            alert(`${member} is excluded by Duke Card Checker!`);
                           }
-                          onClick={() => {
-                            if (!isExcluded) {
-                              toggleSelection(tent.id, member);
-                            } else {
-                              alert(`${member} is excluded by Duke Card Checker!`);
-                            }
-                          }}
-                        >
-                          {member}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  <div className="actions">
-                    <button onClick={() => handleMiss(tent.id)}>Miss</button>
-                    <button onClick={() => handleMake(tent.id)}>Make</button>
-                  </div>
+                        }}
+                      >
+                        {/* Either show " (unselect)" next to selected names: */}
+                        {member}
+                        {isSelected && ' (unselect)'}
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div className="actions">
+                  <button onClick={() => handleMiss(tent.id)}>Miss</button>
+                  <button onClick={() => handleMake(tent.id)}>Make</button>
                 </div>
-              ))}
+              </div>
+            ))}
             </div>
           )}
         </div>
