@@ -84,6 +84,8 @@ const io = new Server(server, {
 let isCheckInProgress = false;
 let activeTents = [];
 let numCheckers = 1;
+let excludedNames = [];
+
 
 /**
  * SOCKET.IO: handle real-time events
@@ -91,13 +93,22 @@ let numCheckers = 1;
 io.on('connection', (socket) => {
   console.log(`Socket connected: ${socket.id}`);
 
-  // (Optional) If you want to emit the current check status to new connections:
   if (isCheckInProgress) {
     socket.emit('checkStarted', {
       activeTents,
       numCheckers,
     });
   }
+   socket.emit('excludedNamesUpdated', excludedNames);
+
+  // 3) Listen for changes to excluded names from any client
+  socket.on('excludedNamesUpdated', (newExcluded) => {
+    // Overwrite the server's global array
+    excludedNames = newExcluded;
+    // Broadcast to all clients (including the one who sent it)
+    io.emit('excludedNamesUpdated', excludedNames);
+    console.log('excludedNames updated:', excludedNames);
+  });
 
   socket.on('disconnect', () => {
     console.log(`Socket disconnected: ${socket.id}`);
@@ -148,9 +159,11 @@ app.post('/api/cancel-check', (req, res) => {
     isCheckInProgress = false;
     activeTents = [];
     numCheckers = 1;
+    excludedNames = [];
 
     // Broadcast via Socket.IO
     io.emit('checkCanceled');
+    io.emit('excludedNamesUpdated', excludedNames);
     console.log('Check canceled successfully');
     return res.status(200).send('Check canceled successfully');
   } catch (error) {
@@ -164,9 +177,11 @@ app.post('/api/end-check', (req, res) => {
     isCheckInProgress = false;
     activeTents = [];
     numCheckers = 1;
+    excludedNames = [];
 
     // Broadcast via Socket.IO
     io.emit('checkEnded');
+    io.emit('excludedNamesUpdated', excludedNames);
     console.log('Check ended successfully');
     return res.status(200).send('Check ended successfully');
   } catch (error) {

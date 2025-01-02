@@ -240,6 +240,12 @@
   background-color: #434aa8; /* Darker shade of blue */
   transform: scale(1.05);
 }
+.excluded {
+  color: gray;
+  text-decoration: line-through;
+  pointer-events: none; /* optional if you want them not clickable */
+  opacity: 0.6;         /* optional, make them faded */
+}
 
 /* Responsive Design */
 @media screen and (max-width: 768px) {

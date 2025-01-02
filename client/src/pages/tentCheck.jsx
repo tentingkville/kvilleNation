@@ -16,7 +16,10 @@ export default function TentCheck() {
   const [currentPage, setCurrentPage] = useState(
     parseInt(localStorage.getItem('currentPage')) || 0
   );
-
+  const [excludedNames, setExcludedNames] = useState([]);
+  // total pages = actual checkers + 1 for the "Duke Card Checker"
+const totalPages = numCheckers + 1;
+const isDukeCardPage = (currentPage === numCheckers);
   // 1) On mount: fetch data, listen to sockets
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -74,12 +77,17 @@ export default function TentCheck() {
       localStorage.setItem('currentPage', 0);
       alert('Check ended!');
     });
+    socket.on('excludedNamesUpdated', (serverExcluded) => {
+      console.log('Received updated excludedNames:', serverExcluded);
+      setExcludedNames(serverExcluded);
+    });
 
     return () => {
       socket.off('checkStarted');
       socket.off('tentStatusUpdated');
       socket.off('checkCanceled');
       socket.off('checkEnded');
+      socket.off('excludedNamesUpdated');
     };
   }, []);
 
@@ -93,7 +101,21 @@ export default function TentCheck() {
       // The server will emit 'checkEnded', which resets everything
     }
   }, [isCheckStarted, tents]);
-
+  const toggleExcludedName = (name) => {
+    setExcludedNames((prev) => {
+      let newExcluded;
+      if (prev.includes(name)) {
+        // remove it
+        newExcluded = prev.filter((x) => x !== name);
+      } else {
+        // add it
+        newExcluded = [...prev, name];
+      }
+      // *** EMIT to server
+      socket.emit('excludedNamesUpdated', newExcluded);
+      return newExcluded; 
+    });
+  };
   // Helper: format date/time
   const getCurrentDateTime = () => {
     const now = new Date();
@@ -156,17 +178,11 @@ export default function TentCheck() {
     }
   };
 
-  // *** Optionally add a manual "End Check" button. ***
-  const handleEndCheck = async () => {
-    try {
-      await axios.post(`${API_BASE_URL}/api/end-check`, {}, { withCredentials: true });
-      // The server will emit 'checkEnded', which resets everything
-    } catch (error) {
-      console.error('Error ending check:', error);
-    }
-  };
-
   const toggleSelection = (tentId, member) => {
+    if (excludedNames.includes(member)) {
+      alert(`${member} is excluded by Duke Card Checker!`);
+      return;
+    }
     setSelectedMembers((prev) => {
       const selectedInTent = prev[tentId] || [];
       if (selectedInTent.includes(member)) {
@@ -250,9 +266,18 @@ export default function TentCheck() {
   };
 
   const tentsInCurrentPage = tents.filter((t) => t.groupIndex === currentPage);
-
+  const allMembers = [];
+  tents.forEach((tent) => {
+    const membersArr = tent.members.split(',').map(m => m.trim()).filter(Boolean);
+    membersArr.forEach((m) => {
+      if (!allMembers.includes(m)) {
+        allMembers.push(m);
+      }
+    });
+  });
   return (
     <div className="tent-check">
+      {/* If the check hasn't started yet, show the "Start Check" UI */}
       {!isCheckStarted ? (
         <div className="start-check">
           <h2>Start Tent Check</h2>
@@ -267,52 +292,102 @@ export default function TentCheck() {
           <button onClick={handleStartCheck}>Start Check</button>
         </div>
       ) : (
+        /* Otherwise, show the normal/cancel UI plus pages */
         <div>
           <button className="cancel-check" onClick={handleCancelCheck}>
             Cancel Check
           </button>
+          
+          {/* totalPages = numCheckers + 1 for the extra Duke Card Checker page */}
           <div className="pagination">
-            {[...Array(numCheckers)].map((_, index) => (
-              <button
-                key={index}
-                className={currentPage === index ? 'active' : ''}
-                onClick={() => handlePageChange(index)}
-              >
-                Page {index + 1}
-              </button>
-            ))}
+            {[...Array(numCheckers + 1)].map((_, index) => {
+              const isDukePage = (index === numCheckers);
+              return (
+                <button
+                  key={index}
+                  className={currentPage === index ? 'active' : ''}
+                  onClick={() => handlePageChange(index)}
+                >
+                  {isDukePage
+                    ? 'Duke Card Checker'
+                    : `Page ${index + 1}`
+                  }
+                </button>
+              );
+            })}
           </div>
-
-          {tentsInCurrentPage.map((tent) => (
-            <div key={tent.id} id={`tent-${tent.id}`} className="tent-card">
-              <h2>Tent {tent.order}</h2>
-              <p>
-                <strong>Day Number:</strong> {tent.dayNumber}
-              </p>
-              <p>
-                <strong>Night Number:</strong> {tent.nightNumber}
-              </p>
-              <ul className="members-list">
-                {tent.members.split(',').map((member) => (
-                  <li
-                    key={member.trim()}
-                    className={
-                      selectedMembers[tent.id]?.includes(member.trim())
-                        ? 'selected'
-                        : ''
-                    }
-                    onClick={() => toggleSelection(tent.id, member.trim())}
-                  >
-                    {member.trim()}
-                  </li>
-                ))}
+  
+          {currentPage === numCheckers ? (
+            /* If we're on the Duke Card Checker page */
+            <div className="duke-card-checker">
+              <h2>Duke Card Checker</h2>
+              <p>Select names to exclude (they will appear 'excluded' on other pages)</p>
+              
+              {/* Flatten all members from all tents into one list */}
+              <ul>
+                {allMembers.map((name) => {
+                  const isExcluded = excludedNames.includes(name);
+                  return (
+                    <li
+                      key={name}
+                      className={isExcluded ? 'excluded' : ''}
+                      onClick={() => toggleExcludedName(name)}
+                    >
+                      {name} {isExcluded && '(excluded)'}
+                    </li>
+                  );
+                })}
               </ul>
-              <div className="actions">
-                <button onClick={() => handleMiss(tent.id)}>Miss</button>
-                <button onClick={() => handleMake(tent.id)}>Make</button>
-              </div>
             </div>
-          ))}
+          ) : (
+            /* Normal checker pages (index < numCheckers). Filter tents by groupIndex */
+            <div>
+              {tentsInCurrentPage.map((tent) => (
+                <div key={tent.id} id={`tent-${tent.id}`} className="tent-card">
+                  <h2>Tent {tent.order}</h2>
+                  <p>
+                    <strong>Day Number:</strong> {tent.dayNumber}
+                  </p>
+                  <p>
+                    <strong>Night Number:</strong> {tent.nightNumber}
+                  </p>
+                  <ul className="members-list">
+                    {tent.members.split(',').map((rawMember) => {
+                      const member = rawMember.trim();
+                      const isExcluded = excludedNames.includes(member);
+                      const isSelected = selectedMembers[tent.id]?.includes(member);
+                      
+                      return (
+                        <li
+                          key={member}
+                          className={
+                            isExcluded
+                              ? 'excluded'
+                              : isSelected
+                                ? 'selected'
+                                : ''
+                          }
+                          onClick={() => {
+                            if (!isExcluded) {
+                              toggleSelection(tent.id, member);
+                            } else {
+                              alert(`${member} is excluded by Duke Card Checker!`);
+                            }
+                          }}
+                        >
+                          {member}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <div className="actions">
+                    <button onClick={() => handleMiss(tent.id)}>Miss</button>
+                    <button onClick={() => handleMake(tent.id)}>Make</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
