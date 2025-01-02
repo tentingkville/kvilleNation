@@ -354,7 +354,6 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                   .map((name) => {
                     const isExcluded = excludedNames.includes(name);
 
-                    // No references to `tent`, `member`, or `isSelected` here
                     return (
                       <li
                         key={name}
@@ -362,7 +361,9 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                         onClick={() => toggleExcludedName(name)}
                       >
                         {name}
-                        {isExcluded && ' (excluded)'}
+                        {isExcluded
+                          ? ' (click to unexclude)'
+                          : ' (click to exclude)'}
                       </li>
                     );
                   })}
