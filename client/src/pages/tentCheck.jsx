@@ -271,11 +271,6 @@ export default function TentCheck() {
           <button className="cancel-check" onClick={handleCancelCheck}>
             Cancel Check
           </button>
-          {/* Manual "End Check" button if you want */}
-          <button className="end-check" onClick={handleEndCheck}>
-            End Check
-          </button>
-
           <div className="pagination">
             {[...Array(numCheckers)].map((_, index) => (
               <button
