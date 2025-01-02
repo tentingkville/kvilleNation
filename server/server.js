@@ -158,6 +158,22 @@ app.post('/api/cancel-check', (req, res) => {
     return res.status(500).send('Failed to cancel check');
   }
 });
+// Route to end the check
+app.post('/api/end-check', (req, res) => {
+  try {
+    isCheckInProgress = false;
+    activeTents = [];
+    numCheckers = 1;
+
+    // Broadcast via Socket.IO
+    io.emit('checkEnded');
+    console.log('Check ended successfully');
+    return res.status(200).send('Check ended successfully');
+  } catch (error) {
+    console.error('Error ending check:', error.message);
+    return res.status(500).send('Failed to end check');
+  }
+});
 
 // Route to update tent status (Miss or Make)
 app.post('/api/tent-checks/update', async (req, res) => {

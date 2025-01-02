@@ -46,6 +46,7 @@ export default function TentCheck() {
 
     fetchInitialData();
 
+    // Socket listeners
     socket.on('checkStarted', ({ activeTents, numCheckers }) => {
       setIsCheckStarted(true);
       setTents(activeTents);
@@ -65,18 +66,31 @@ export default function TentCheck() {
       localStorage.setItem('currentPage', 0);
     });
 
+    // *** New: Listen for 'checkEnded' ***
+    socket.on('checkEnded', () => {
+      setIsCheckStarted(false);
+      setTents([]);
+      setCurrentPage(0);
+      localStorage.setItem('currentPage', 0);
+      alert('Check ended!');
+    });
+
     return () => {
       socket.off('checkStarted');
       socket.off('tentStatusUpdated');
       socket.off('checkCanceled');
+      socket.off('checkEnded');
     };
   }, []);
 
   // 2) If the check is started but no tents remain, end automatically
+  //    We'll call /api/end-check to let the server know.
   useEffect(() => {
     if (isCheckStarted && tents.length === 0) {
-      alert('Check ended!');
-      setIsCheckStarted(false);    // Switches back to the "Start Check" UI
+      alert('No more tents — ending check now...');
+      axios.post(`${API_BASE_URL}/api/end-check`, {}, { withCredentials: true })
+        .catch((err) => console.error('Error ending check automatically:', err));
+      // The server will emit 'checkEnded', which resets everything
     }
   }, [isCheckStarted, tents]);
 
@@ -93,15 +107,15 @@ export default function TentCheck() {
       alert('A check has already started.');
       return;
     }
-    // Re-fetch tents to ensure we have the latest
+    // Re-fetch tents
     const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
       withCredentials: true,
     });
     const sortedTents = tentsResponse.data.sort((a, b) => a.order - b.order);
 
+    // chunk them by groupIndex
     const chunkSize = Math.ceil(sortedTents.length / numCheckers);
     let assignedTents = [...sortedTents];
-
     for (let i = 0; i < numCheckers; i++) {
       const start = i * chunkSize;
       const end = start + chunkSize;
@@ -139,6 +153,16 @@ export default function TentCheck() {
       alert('Check has been canceled');
     } catch (error) {
       console.error('Error canceling check:', error);
+    }
+  };
+
+  // *** Optionally add a manual "End Check" button. ***
+  const handleEndCheck = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/api/end-check`, {}, { withCredentials: true });
+      // The server will emit 'checkEnded', which resets everything
+    } catch (error) {
+      console.error('Error ending check:', error);
     }
   };
 
@@ -197,7 +221,6 @@ export default function TentCheck() {
           },
           { withCredentials: true }
         );
-        // The server emits 'tentStatusUpdated', removing it from active list
       }, 500);
     } catch (error) {
       console.error('Error marking miss:', error);
@@ -226,13 +249,10 @@ export default function TentCheck() {
     }
   };
 
-  // Filter tents by groupIndex
   const tentsInCurrentPage = tents.filter((t) => t.groupIndex === currentPage);
 
-  // Return the UI
   return (
     <div className="tent-check">
-      {/* If check not started, show the "Start Check" UI */}
       {!isCheckStarted ? (
         <div className="start-check">
           <h2>Start Tent Check</h2>
@@ -250,6 +270,10 @@ export default function TentCheck() {
         <div>
           <button className="cancel-check" onClick={handleCancelCheck}>
             Cancel Check
+          </button>
+          {/* Manual "End Check" button if you want */}
+          <button className="end-check" onClick={handleEndCheck}>
+            End Check
           </button>
 
           <div className="pagination">
