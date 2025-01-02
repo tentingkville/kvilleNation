@@ -85,7 +85,7 @@ let isCheckInProgress = false;
 let activeTents = [];
 let numCheckers = 1;
 let excludedNames = [];
-
+let selectedMembers = {};
 
 /**
  * SOCKET.IO: handle real-time events
@@ -100,6 +100,7 @@ io.on('connection', (socket) => {
     });
   }
    socket.emit('excludedNamesUpdated', excludedNames);
+   socket.emit('selectedMembersUpdated', selectedMembers);
 
   // 3) Listen for changes to excluded names from any client
   socket.on('excludedNamesUpdated', (newExcluded) => {
@@ -109,7 +110,10 @@ io.on('connection', (socket) => {
     io.emit('excludedNamesUpdated', excludedNames);
     console.log('excludedNames updated:', excludedNames);
   });
-
+  socket.on('selectedMembersUpdated', (newSelected) => {
+    selectedMembers = newSelected;
+    io.emit('selectedMembersUpdated', selectedMembers);
+  });
   socket.on('disconnect', () => {
     console.log(`Socket disconnected: ${socket.id}`);
   });

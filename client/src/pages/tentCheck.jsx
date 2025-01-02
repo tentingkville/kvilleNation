@@ -82,6 +82,9 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
     socket.on('excludedNamesUpdated', (serverExcluded) => {
       setExcludedNames(serverExcluded);
     });
+    socket.on('selectedMembersUpdated', (serverSelected) => {
+      setSelectedMembers(serverSelected);
+    });
 
     return () => {
       socket.off('checkStarted');
@@ -186,17 +189,27 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
     }
     setSelectedMembers((prev) => {
       const selectedInTent = prev[tentId] || [];
+      let updated;
+  
       if (selectedInTent.includes(member)) {
-        return {
+        // Remove the member
+        updated = {
           ...prev,
           [tentId]: selectedInTent.filter((m) => m !== member),
         };
       } else {
-        return {
+        // Add the member
+        updated = {
           ...prev,
           [tentId]: [...selectedInTent, member],
         };
       }
+  
+      // Emit the updated state to the server for broadcasting
+      socket.emit('selectedMembersUpdated', updated);
+  
+      // Return the updated state so React knows the final version
+      return updated;
     });
   };
 
