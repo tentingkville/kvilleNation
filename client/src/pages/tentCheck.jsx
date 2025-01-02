@@ -361,9 +361,6 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                         onClick={() => toggleExcludedName(name)}
                       >
                         {name}
-                        {isExcluded
-                          ? ' (click to unexclude)'
-                          : ' (click to exclude)'}
                       </li>
                     );
                   })}

@@ -152,7 +152,7 @@
 .excluded {
   color: gray;
   text-decoration: line-through;
-  pointer-events: none; /* optional to disable clicking */
+  /* pointer-events: none; optional to disable clicking */
   opacity: 0.6;
 }
 
