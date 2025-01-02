@@ -80,7 +80,6 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
       alert('Check ended!');
     });
     socket.on('excludedNamesUpdated', (serverExcluded) => {
-      console.log('Received updated excludedNames:', serverExcluded);
       setExcludedNames(serverExcluded);
     });
 
@@ -299,7 +298,7 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
           <button className="cancel-check" onClick={handleCancelCheck}>
             Cancel Check
           </button>
-          
+  
           {/* totalPages = numCheckers + 1 for the extra Duke Card Checker page */}
           <div className="pagination">
             {[...Array(numCheckers + 1)].map((_, index) => {
@@ -324,6 +323,8 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
             <div className="duke-card-checker">
               <h2>Duke Card Checker</h2>
               <p>Select names to exclude (they will appear 'excluded' on other pages)</p>
+  
+              {/* SEARCH BAR */}
               <div className="search-bar">
                 <input
                   type="text"
@@ -332,20 +333,25 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                   onChange={(e) => setDukeSearchTerm(e.target.value)}
                 />
               </div>
-              {/* Flatten all members from all tents into one list */}
+  
+              {/* Flatten all members from all tents into one list & filter by dukeSearchTerm */}
               <ul>
-                {allMembers.map((name) => {
-                  const isExcluded = excludedNames.includes(name);
-                  return (
-                    <li
-                      key={name}
-                      className={isExcluded ? 'excluded' : ''}
-                      onClick={() => toggleExcludedName(name)}
-                    >
-                      {name} {isExcluded && '(excluded)'}
-                    </li>
-                  );
-                })}
+                {allMembers
+                  .filter((name) =>
+                    name.toLowerCase().includes(dukeSearchTerm.toLowerCase())
+                  )
+                  .map((name) => {
+                    const isExcluded = excludedNames.includes(name);
+                    return (
+                      <li
+                        key={name}
+                        className={isExcluded ? 'excluded' : ''}
+                        onClick={() => toggleExcludedName(name)}
+                      >
+                        {name} {isExcluded && '(excluded)'}
+                      </li>
+                    );
+                  })}
               </ul>
             </div>
           ) : (
@@ -365,7 +371,7 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                       const member = rawMember.trim();
                       const isExcluded = excludedNames.includes(member);
                       const isSelected = selectedMembers[tent.id]?.includes(member);
-                      
+  
                       return (
                         <li
                           key={member}
