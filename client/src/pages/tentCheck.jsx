@@ -400,7 +400,7 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                           }}
                         >
                           {member}
-                          {isSelected && ' (unselect)'}
+                          {isSelected}
                         </li>
                       );
                     })}
