@@ -332,12 +332,11 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
           </div>
   
           {currentPage === numCheckers ? (
-            /* If we're on the Duke Card Checker page */
+            /* DUKE CARD CHECKER PAGE */
             <div className="duke-card-checker">
               <h2>Duke Card Checker</h2>
               <p>Select names to exclude (they will appear 'excluded' on other pages)</p>
-  
-              {/* SEARCH BAR */}
+
               <div className="search-bar">
                 <input
                   type="text"
@@ -346,8 +345,7 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                   onChange={(e) => setDukeSearchTerm(e.target.value)}
                 />
               </div>
-  
-              {/* Flatten all members from all tents into one list & filter by dukeSearchTerm */}
+
               <ul>
                 {allMembers
                   .filter((name) =>
@@ -355,74 +353,69 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
                   )
                   .map((name) => {
                     const isExcluded = excludedNames.includes(name);
+
+                    // No references to `tent`, `member`, or `isSelected` here
                     return (
                       <li
-                      key={member}
-                      className={
-                        isExcluded
-                          ? 'excluded'
-                          : isSelected
-                            ? 'selected'
-                            : ''
-                      }
-                      onClick={() => toggleSelection(tent.id, member)}
-                    >
-                      {member} 
-                      {isSelected && ' (click to unselect)'}
-                    </li>
+                        key={name}
+                        className={isExcluded ? 'excluded' : ''}
+                        onClick={() => toggleExcludedName(name)}
+                      >
+                        {name}
+                        {isExcluded && ' (excluded)'}
+                      </li>
                     );
                   })}
               </ul>
             </div>
           ) : (
-            /* Normal checker pages (index < numCheckers). Filter tents by groupIndex */
+            /* NORMAL CHECKER PAGES for index < numCheckers */
             <div>
               {tentsInCurrentPage.map((tent) => (
-              <div key={tent.id} id={`tent-${tent.id}`} className="tent-card">
-                <h2>Tent {tent.order}</h2>
-                <p><strong>Day Number:</strong> {tent.dayNumber}</p>
-                <p><strong>Night Number:</strong> {tent.nightNumber}</p>
-                
-                <ul className="members-list">
-                  {tent.members.split(',').map((rawMember) => {
-                    // Define variables in the correct scope
-                    const member = rawMember.trim();
-                    const isExcluded = excludedNames.includes(member);
-                    const isSelected = selectedMembers[tent.id]?.includes(member);
+                <div key={tent.id} id={`tent-${tent.id}`} className="tent-card">
+                  <h2>Tent {tent.order}</h2>
+                  <p><strong>Day Number:</strong> {tent.dayNumber}</p>
+                  <p><strong>Night Number:</strong> {tent.nightNumber}</p>
 
-                    return (
-                      <li
-                        key={member}
-                        className={
-                          isExcluded
-                            ? 'excluded'
-                            : isSelected
-                              ? 'selected'
-                              : ''
-                        }
-                        onClick=  {() => {
-                          if (!isExcluded) {
-                            toggleSelection(tent.id, member);
-                          } else {
-                            alert(`${member} is excluded by Duke Card Checker!`);
+                  <ul className="members-list">
+                    {tent.members.split(',').map((rawMember) => {
+                      const member = rawMember.trim();
+                      const isExcluded = excludedNames.includes(member);
+                      const isSelected = selectedMembers[tent.id]?.includes(member);
+
+                      return (
+                        <li
+                          key={member}
+                          className={
+                            isExcluded
+                              ? 'excluded'
+                              : isSelected
+                                ? 'selected'
+                                : ''
                           }
-                        }}
-                      >
-                        {/* Either show " (unselect)" next to selected names: */}
-                        {member}
-                        {isSelected && ' (unselect)'}
-                      </li>
-                    );
-                  })}
-                </ul>
-                <div className="actions">
-                  <button onClick={() => handleMiss(tent.id)}>Miss</button>
-                  <button onClick={() => handleMake(tent.id)}>Make</button>
-                </div>
-              </div>
-            ))}
-            </div>
-          )}
+                          onClick={() => {
+                            if (!isExcluded) {
+                              toggleSelection(tent.id, member);
+                            } else {
+                              alert(`${member} is excluded by Duke Card Checker!`);
+                            }
+                          }}
+                        >
+                          {member}
+                          {isSelected && ' (unselect)'}
+                        </li>
+                      );
+                    })}
+                  </ul>
+
+        <div className="actions">
+          <button onClick={() => handleMiss(tent.id)}>Miss</button>
+          <button onClick={() => handleMake(tent.id)}>Make</button>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
         </div>
       )}
     </div>
