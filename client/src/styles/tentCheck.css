@@ -349,6 +349,7 @@
   font-size: 1.2rem;
   min-width: 30px; /* ensures single-digit stays consistent in width */
   text-align: center;
+  color: #001A57 ;
 }
 
 /* Medium screens (≤768px) */
