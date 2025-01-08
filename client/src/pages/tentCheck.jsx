@@ -120,14 +120,19 @@ export default function TentCheck() {
       return newExcluded; 
     });
   };
-  // Helper: format date/time
   const getCurrentDateTime = () => {
-    const now = new Date();
-    const date = now.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
-    const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    return `${date} ${time}`;
+    const dateTimeStr = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      month: 'numeric',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date());
+    
+    return dateTimeStr;
   };
-
   const handleStartCheck = async () => {
     if (isCheckStarted) {
       alert('A check has already started.');
