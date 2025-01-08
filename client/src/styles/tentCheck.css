@@ -246,7 +246,7 @@
   padding: 10px 20px;
   font-size: 1rem;
   font-weight: bold;
-  background-color: #5a67d8; /* Refined blue tone */
+  background-color: #012169; /* Refined blue tone */
   color: white;
   border: none;
   border-radius: 5px;
@@ -255,7 +255,7 @@
 }
 
 .start-check button:hover {
-  background-color: #434aa8; /* Darker shade of blue */
+  background-color: #00539B; /* Darker shade of blue */
   transform: scale(1.05);
 }
 
@@ -319,8 +319,37 @@
 .duke-card-checker ul li:hover {
   background-color: #e2e6ea;
 }
+.spinner-container {
+  display: flex;
+  align-items: center;   /* centers vertically */
+  justify-content: center; /* centers horizontally */
+  gap: 10px;             /* space between - and + */
+  margin: 15px auto;     /* 15px vertical and auto horizontal to center container */
+}
 
-/* Responsive Design for smaller devices */
+.spinner-button {
+  background-color: #00539B;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;          /* ensure content inside button is also centered */
+  align-items: center;    /* vertical center inside button */
+  justify-content: center;/* horizontal center inside button */
+}
+
+.spinner-button:hover {
+  opacity: 0.9;
+}
+
+.checker-value {
+  font-size: 1.2rem;
+  min-width: 30px; /* ensures single-digit stays consistent in width */
+  text-align: center;
+}
 
 /* Medium screens (≤768px) */
 @media screen and (max-width: 768px) {

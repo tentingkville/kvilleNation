@@ -18,9 +18,8 @@ export default function TentCheck() {
   );
   const [excludedNames, setExcludedNames] = useState([]);
   // total pages = actual checkers + 1 for the "Duke Card Checker"
-const totalPages = numCheckers + 1;
-const isDukeCardPage = (currentPage === numCheckers);
-const [dukeSearchTerm, setDukeSearchTerm] = useState('');
+
+  const [dukeSearchTerm, setDukeSearchTerm] = useState('');
 
   // 1) On mount: fetch data, listen to sockets
   useEffect(() => {
@@ -169,6 +168,7 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
     }
   };
 
+
   const handleCancelCheck = async () => {
     try {
       await axios.post(`${API_BASE_URL}/api/cancel-check`, {}, { withCredentials: true });
@@ -180,6 +180,22 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
     } catch (error) {
       console.error('Error canceling check:', error);
     }
+  };
+
+  const decrementCheckers = () => {
+    setNumCheckers((prev) => {
+      const newVal = Math.max(1, prev - 1);
+      localStorage.setItem('numCheckers', newVal);
+      return newVal;
+    });
+  };
+
+  const incrementCheckers = () => {
+    setNumCheckers((prev) => {
+      const newVal = prev + 1;
+      localStorage.setItem('numCheckers', newVal);
+      return newVal;
+    });
   };
 
   const toggleSelection = (tentId, member) => {
@@ -291,20 +307,24 @@ const [dukeSearchTerm, setDukeSearchTerm] = useState('');
   });
   return (
     <div className="tent-check">
-      {/* If the check hasn't started yet, show the "Start Check" UI */}
       {!isCheckStarted ? (
         <div className="start-check">
           <h2>Start Tent Check</h2>
-          <label htmlFor="numCheckers">How many checkers?</label>
-          <input
-            id="numCheckers"
-            type="number"
-            value={numCheckers}
-            onChange={handleNumCheckersChange}
-            min="1"
-          />
-          <button onClick={handleStartCheck}>Start Check</button>
-        </div>
+          
+          {/* This replaces the <input type="number"> */}
+          <label>How many checkers?</label>
+          <div className="spinner-container">
+            <button onClick={decrementCheckers} className="spinner-button">
+              –
+            </button>
+            <span className="checker-value">{numCheckers}</span>
+            <button onClick={incrementCheckers} className="spinner-button">
+              +
+            </button>
+    </div>
+
+        <button onClick={handleStartCheck}>Start Check</button>
+      </div>
       ) : (
         /* Otherwise, show the normal/cancel UI plus pages */
         <div>
