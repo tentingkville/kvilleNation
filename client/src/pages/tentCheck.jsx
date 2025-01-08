@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import '../styles/tentCheck.css'; 
+import UserContext from '../userContext';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const socket = io(API_BASE_URL, { withCredentials: true });
@@ -20,7 +21,7 @@ export default function TentCheck() {
   // total pages = actual checkers + 1 for the "Duke Card Checker"
 
   const [dukeSearchTerm, setDukeSearchTerm] = useState('');
-
+  const { user } = useContext(UserContext); 
   // 1) On mount: fetch data, listen to sockets
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -221,10 +222,8 @@ export default function TentCheck() {
         };
       }
   
-      // Emit the updated state to the server for broadcasting
       socket.emit('selectedMembersUpdated', updated);
   
-      // Return the updated state so React knows the final version
       return updated;
     });
   };
@@ -252,7 +251,7 @@ export default function TentCheck() {
         return;
       }
 
-      const lastMissLM = 'user'; // Replace with actual user if needed
+      const lastMissLM = user.firstName || "Unknown User"; 
       const dateOfLastMiss = getCurrentDateTime();
 
       document.getElementById(`tent-${tentId}`).classList.add('removing');
