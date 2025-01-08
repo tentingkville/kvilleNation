@@ -330,6 +330,7 @@
   min-width: 30px;
   text-align: center;
   color: #001A57 ;
+  text-decoration: none;
 }
 
 @media screen and (max-width: 768px) {

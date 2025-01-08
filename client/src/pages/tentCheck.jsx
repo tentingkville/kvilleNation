@@ -315,7 +315,6 @@ export default function TentCheck() {
         <div className="start-check">
           <h2>Start Tent Check</h2>
           
-          {/* This replaces the <input type="number"> */}
           <label>How many checkers?</label>
           <div className="spinner-container">
             <button onClick={decrementCheckers} className="spinner-button">
