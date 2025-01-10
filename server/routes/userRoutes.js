@@ -17,10 +17,11 @@ router.get('/profile', authenticateToken, (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-  const { netID, email, firstName, lastName, password } = req.body;
+  let { netID, email, firstName, lastName, password } = req.body;
 
+  // Force netID to lowercase before using it
   netID = netID.toLowerCase();
-  
+
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -31,31 +32,35 @@ router.post('/register', async (req, res) => {
       firstName,
       lastName,
       password: hashedPassword,
-      isLineMonitor: false, // or default to false in your schema
-      isSuperUser: false,   // or default to false in your schema
+      isLineMonitor: false,
+      isSuperUser: false,
     });
+
     await newUser.save();
 
     return res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error('Register error:', error);
 
-    // Handle duplicate key errors (E11000) for netID or email
     if (error.code === 11000) {
-      return res.status(400).json({ error: 'User with that netID or email already exists.' });
+      return res
+        .status(400)
+        .json({ error: 'User with that netID or email already exists.' });
     }
-
     return res.status(500).json({ error: error.message });
   }
 });
 // Login route
 router.post('/login', async (req, res) => {
-  const { netID, password } = req.body;
+  let { netID, password } = req.body;
 
+  // Force netID to lowercase before doing findOne
   netID = netID.toLowerCase();
 
   if (!netID || !password) {
-    return res.status(400).json({ error: 'NetID and password are required' });
+    return res
+      .status(400)
+      .json({ error: 'NetID and password are required' });
   }
 
   try {
@@ -82,7 +87,6 @@ router.post('/login', async (req, res) => {
       { expiresIn: '4d' }
     );
 
-    // Send the token and user details on success
     return res.json({
       token,
       firstName: user.firstName,
