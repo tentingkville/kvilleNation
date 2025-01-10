@@ -30,8 +30,9 @@ export default function TentCheck() {
         const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
           withCredentials: true,
         });
-        const sortedTents = tentsResponse.data.sort((a, b) => a.order - b.order);
-
+        const sortedTents = tentsResponse.data.sort((a, b) =>
+          a.order.localeCompare(b.order)
+        );
         // check if a check is in progress
         const checkResponse = await axios.get(`${API_BASE_URL}/api/check-status`, {
           withCredentials: true,
@@ -231,16 +232,6 @@ export default function TentCheck() {
   
       return updated;
     });
-  };
-
-  const handleNumCheckersChange = (e) => {
-    if (isCheckStarted) {
-      alert('Cannot change number of checkers during an active check');
-      return;
-    }
-    const newNumCheckers = parseInt(e.target.value) || 1;
-    setNumCheckers(newNumCheckers);
-    localStorage.setItem('numCheckers', newNumCheckers);
   };
 
   const handlePageChange = (pageIndex) => {
