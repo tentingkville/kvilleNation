@@ -31,7 +31,7 @@ export default function TentCheck() {
           withCredentials: true,
         });
         const sortedTents = tentsResponse.data.sort((a, b) =>
-          a.order.localeCompare(b.order)
+          a.order.localeCompare(b.order, 'en', { numeric: true })
         );
         // check if a check is in progress
         const checkResponse = await axios.get(`${API_BASE_URL}/api/check-status`, {
