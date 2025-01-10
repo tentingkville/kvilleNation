@@ -19,6 +19,8 @@ router.get('/profile', authenticateToken, (req, res) => {
 router.post('/register', async (req, res) => {
   const { netID, email, firstName, lastName, password } = req.body;
 
+  netID = netID.toLowerCase();
+  
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -49,6 +51,8 @@ router.post('/register', async (req, res) => {
 // Login route
 router.post('/login', async (req, res) => {
   const { netID, password } = req.body;
+
+  netID = netID.toLowerCase();
 
   if (!netID || !password) {
     return res.status(400).json({ error: 'NetID and password are required' });
