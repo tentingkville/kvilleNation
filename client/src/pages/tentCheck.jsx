@@ -342,6 +342,21 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
       }
     });
   });
+
+  function getRangeForPage(pageIndex) {
+    // 1) Filter out tents for this page
+    const pageTents = tents.filter((t) => t.groupIndex === pageIndex);
+    if (pageTents.length === 0) return '';
+  
+    // 2) Since you assigned groupIndex *after* sorting,
+    //    the subset is already in ascending order.
+    //    So just take the first and last item in pageTents.
+    const firstOrder = pageTents[0].order;
+    const lastOrder = pageTents[pageTents.length - 1].order;
+  
+    // 3) Return the 'lowest' - 'highest' range
+    return `${firstOrder} - ${lastOrder}`;
+  }
   return (
     <div className="tent-check">
       {!isCheckStarted ? (
@@ -362,16 +377,20 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
         <button onClick={handleStartCheck}>Start Check</button>
       </div>
       ) : (
-        /* Otherwise, show the normal/cancel UI plus pages */
         <div>
           <button className="cancel-check" onClick={handleCancelCheck}>
             Cancel Check
           </button>
-  
-          {/* totalPages = numCheckers + 1 for the extra Duke Card Checker page */}
           <div className="pagination">
             {[...Array(numCheckers + 1)].map((_, index) => {
               const isDukePage = (index === numCheckers);
+
+              let range = '';
+              // Only compute the range if it's NOT the Duke Card Checker
+              if (!isDukePage) {
+                range = getRangeForPage(index); // e.g. "A - U"
+              }
+
               return (
                 <button
                   key={index}
@@ -380,7 +399,7 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
                 >
                   {isDukePage
                     ? 'Duke Card Checker'
-                    : `Page ${index + 1}`
+                    : `Page ${index + 1} (${range})`
                   }
                 </button>
               );
