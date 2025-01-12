@@ -15,46 +15,52 @@ router.get('/events', authenticateToken, async (req, res) => {
 });
 
 // Create an event
+// Create an event (new approach)
 router.post('/create', authenticateToken, async (req, res) => {
-  const { name, startDate, startTime, endDate, endTime } = req.body;
+  const { name, startDateTime, endDateTime } = req.body;
 
-  if (!name || !startDate || !startTime) {
-    return res.status(400).send({ error: 'Name, startDate, and startTime are required' });
+  // name & startDateTime are required
+  if (!name || !startDateTime) {
+    return res.status(400).send({ error: 'Name and startDateTime are required' });
   }
 
   try {
-    const newEvent = new Event({ name, startDate, startTime, endDate, endTime });
+    // store them in the new schema fields
+    const newEvent = new Event({
+      name,
+      startDateTime,  // e.g. "2025-01-12T14:00:00.000Z"
+      endDateTime,    // optional
+    });
+
     await newEvent.save();
-    res.status(201).send(newEvent);
+    return res.status(201).send(newEvent);
   } catch (error) {
     console.error('Error creating event:', error);
     res.status(500).send({ error: 'Internal server error' });
   }
 });
-
 // Update an event
 router.put('/update/:id', authenticateToken, async (req, res) => {
-    const { id } = req.params;
-    const { name, startDate, startTime, endDate, endTime } = req.body;
+  const { id } = req.params;
+  const { name, startDateTime, endDateTime } = req.body;
 
-    try {
-        const updatedEvent = await Event.findByIdAndUpdate(
-            id,
-            { name, startDate, startTime, endDate, endTime },
-            { new: true }
-        );
+  try {
+    const updatedEvent = await Event.findByIdAndUpdate(
+      id,
+      { name, startDateTime, endDateTime },
+      { new: true } // return the updated doc
+    );
 
-        if (!updatedEvent) {
-            return res.status(404).send({ error: 'Event not found' });
-        }
-
-        res.status(200).send(updatedEvent);
-    } catch (error) {
-        console.error('Error updating event:', error);
-        res.status(500).send({ error: 'Internal server error' });
+    if (!updatedEvent) {
+      return res.status(404).send({ error: 'Event not found' });
     }
-});
 
+    res.status(200).send(updatedEvent);
+  } catch (error) {
+    console.error('Error updating event:', error);
+    res.status(500).send({ error: 'Internal server error' });
+  }
+});
 // Delete an event
 router.delete('/delete/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;

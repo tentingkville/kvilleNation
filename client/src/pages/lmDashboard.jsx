@@ -3,12 +3,32 @@ import '../styles/lmDashboard.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const LmDashboard = () => {
+function combineDateTimeAsISO(dateStr, timeStr) {
+  // If date is empty, return null
+  if (!dateStr) return null;
+  // If time is empty, default to "00:00" (start of the day)
+  const safeTimeStr = timeStr || '00:00';
+
+  // Create a local Date object from the user’s date+time
+  // Example: "2025-01-12" + "14:00" => new Date("2025-01-12T14:00")
+  const localDate = new Date(`${dateStr}T${safeTimeStr}`);
+
+  // Option A (recommended): store exact local moment in ISO
+  // e.g. "2025-01-12T14:00:00.000Z" (but includes offset if your environment is behind UTC)
+  // return localDate.toISOString();
+
+  // Option B: Convert explicitly to a midnight-UTC style if you want, but typically .toISOString() is best:
+  return localDate.toISOString();
+}
+
+export default function LmDashboard() {
   const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  
+  // We'll keep the form state for separate date/time inputs (for the user's convenience)
   const [eventForm, setEventForm] = useState({
     id: null,
     name: '',
@@ -62,22 +82,15 @@ const LmDashboard = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({
-          netID,
-          field,
-          value: newValue,
-        }),
+        body: JSON.stringify({ netID, field, value: newValue }),
       });
 
       if (response.ok) {
-        setUsers((prevUsers) =>
-          prevUsers.map((u) =>
-            u.netID === netID ? { ...u, [field]: newValue } : u
-          )
+        setUsers((prev) =>
+          prev.map((u) => (u.netID === netID ? { ...u, [field]: newValue } : u))
         );
         setSuccessMessage(`Updated ${field} status for ${user.firstName}`);
         setErrorMessage('');
-
         setTimeout(() => setSuccessMessage(''), 5000);
       } else {
         const errorData = await response.json();
@@ -105,16 +118,22 @@ const LmDashboard = () => {
       return;
     }
 
+    // Combine date & time into single ISO string
+    const startDateTime = combineDateTimeAsISO(startDate, startTime); 
+    let endDateTime = null;
+    if (endDate) {
+      endDateTime = combineDateTimeAsISO(endDate, endTime);
+    }
+
+    // Build the payload
     const payload = {
       name,
-      startDate,
-      startTime,
-      endDate,
-      endTime,
+      startDateTime,  // single field
+      endDateTime,    // single field
     };
 
     try {
-      const endpoint = id ? `/api/events/update/${id}` : '/api/events/create';
+      const endpoint = id ? `/api/events/update/${id}` : `/api/events/create`;
       const method = id ? 'PUT' : 'POST';
 
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -130,14 +149,14 @@ const LmDashboard = () => {
         const updatedEvent = await response.json();
 
         if (id) {
-          setEvents((prevEvents) =>
-            prevEvents.map((event) =>
-              event._id === id ? updatedEvent : event
-            )
+          // Updating existing event
+          setEvents((prev) =>
+            prev.map((evt) => (evt._id === id ? updatedEvent : evt))
           );
           setSuccessMessage('Event updated successfully!');
         } else {
-          setEvents((prevEvents) => [...prevEvents, updatedEvent]);
+          // Creating a new event
+          setEvents((prev) => [...prev, updatedEvent]);
           setSuccessMessage('Event created successfully!');
         }
 
@@ -165,13 +184,16 @@ const LmDashboard = () => {
   };
 
   const handleEditEvent = (event) => {
+    // We'll assume the server returns "startDateTime" & "endDateTime" as ISO strings
+    // If event has separate fields, adapt accordingly
     setEventForm({
       id: event._id,
       name: event.name,
-      startDate: event.startDate,
-      startTime: event.startTime || '',
-      endDate: event.endDate || '',
-      endTime: event.endTime || '',
+      // Convert ISO back to date/time strings for the form
+      startDate: event.startDateTime ? event.startDateTime.slice(0, 10) : '',
+      startTime: event.startDateTime ? event.startDateTime.slice(11, 16) : '',
+      endDate: event.endDateTime ? event.endDateTime.slice(0, 10) : '',
+      endTime: event.endDateTime ? event.endDateTime.slice(11, 16) : '',
     });
   };
 
@@ -185,9 +207,7 @@ const LmDashboard = () => {
       });
 
       if (response.ok) {
-        setEvents((prevEvents) =>
-          prevEvents.filter((event) => event._id !== id)
-        );
+        setEvents((prev) => prev.filter((evt) => evt._id !== id));
         setSuccessMessage('Event deleted successfully!');
         setErrorMessage('');
       } else {
@@ -213,6 +233,7 @@ const LmDashboard = () => {
   return (
     <div className="lm-dashboard">
       <h1>Line Monitor Dashboard</h1>
+
       <div className="search-container">
         <input
           type="text"
@@ -221,8 +242,11 @@ const LmDashboard = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+
       {successMessage && <p className="success-message">{successMessage}</p>}
       {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+      {/* USERS TABLE */}
       <div className="table-wrapper">
         <table>
           <thead>
@@ -265,109 +289,117 @@ const LmDashboard = () => {
           </tbody>
         </table>
       </div>
+
+      {/* EVENTS SECTION */}
       <div className="events-section">
-  <h2>Manage Events</h2>
-  <div className="event-search-container">
-    <input
-      type="text"
-      placeholder="Search events..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-    />
-  </div>
-  <div className="event-form">
-    <input
-      type="text"
-      name="name"
-      value={eventForm.name}
-      onChange={handleInputChange}
-      placeholder="Event Name"
-      required
-    />
-    <label>
-      Start Date:
-      <input
-        type="date"
-        name="startDate"
-        value={eventForm.startDate}
-        onChange={handleInputChange}
-        required
-      />
-    </label>
-    <label>
-      Start Time:
-      <input
-        type="time"
-        name="startTime"
-        value={eventForm.startTime}
-        onChange={handleInputChange}
-      />
-    </label>
-    <label>
-      End Date:
-      <input
-        type="date"
-        name="endDate"
-        value={eventForm.endDate}
-        onChange={handleInputChange}
-      />
-    </label>
-    <label>
-      End Time:
-      <input
-        type="time"
-        name="endTime"
-        value={eventForm.endTime}
-        onChange={handleInputChange}
-      />
-    </label>
-    <button onClick={handleCreateOrUpdateEvent}>
-      {eventForm.id ? 'Update Event' : 'Create Event'}
-    </button>
-  </div>
-  <div className="event-table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Start Date</th>
-          <th>Start Time</th>
-          <th>End Date</th>
-          <th>End Time</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {events
-          .filter((event) =>
-            event.name.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .map((event) => (
-            <tr key={event._id}>
-              <td>{event.name}</td>
-              <td>{event.startDate}</td>
-              <td>{event.startTime}</td>
-              <td>{event.endDate || 'N/A'}</td>
-              <td>{event.endTime || 'N/A'}</td>
-              <td>
-                <button className="edit-btn" onClick={() => handleEditEvent(event)}>
-                  Edit
-                </button>
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDeleteEvent(event._id)}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-      </tbody>
-    </table>
-  </div>
-</div>
+        <h2>Manage Events</h2>
+        <div className="event-search-container">
+          <input
+            type="text"
+            placeholder="Search events..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* CREATE/EDIT FORM */}
+        <div className="event-form">
+          <input
+            type="text"
+            name="name"
+            value={eventForm.name}
+            onChange={handleInputChange}
+            placeholder="Event Name"
+            required
+          />
+
+          <label>
+            Start Date:
+            <input
+              type="date"
+              name="startDate"
+              value={eventForm.startDate}
+              onChange={handleInputChange}
+              required
+            />
+          </label>
+          <label>
+            Start Time:
+            <input
+              type="time"
+              name="startTime"
+              value={eventForm.startTime}
+              onChange={handleInputChange}
+            />
+          </label>
+          <label>
+            End Date:
+            <input
+              type="date"
+              name="endDate"
+              value={eventForm.endDate}
+              onChange={handleInputChange}
+            />
+          </label>
+          <label>
+            End Time:
+            <input
+              type="time"
+              name="endTime"
+              value={eventForm.endTime}
+              onChange={handleInputChange}
+            />
+          </label>
+
+          <button onClick={handleCreateOrUpdateEvent}>
+            {eventForm.id ? 'Update Event' : 'Create Event'}
+          </button>
+        </div>
+
+        {/* EVENTS TABLE */}
+        <div className="event-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>StartDateTime</th>
+                <th>EndDateTime</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {events
+                .filter((event) =>
+                  event.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((event) => (
+                  <tr key={event._id}>
+                    <td>{event.name}</td>
+
+                    {/* We assume the server is returning event.startDateTime & event.endDateTime as strings */}
+                    <td>{event.startDateTime || 'N/A'}</td>
+                    <td>{event.endDateTime || 'N/A'}</td>
+
+                    <td>
+                      <button
+                        className="edit-btn"
+                        onClick={() => handleEditEvent(event)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeleteEvent(event._id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default LmDashboard;
+}

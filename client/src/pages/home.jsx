@@ -6,7 +6,9 @@ import InstagramEmbedKvilleNation from '../components/kville_official_ig.jsx';
 import InstagramEmbedDukeMBB from '../components/dukembb_ig.jsx';
 import SpotifyEmbed from '../components/spotifyEmbed.jsx';
 
+
 const Home = () => {
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
   const [data, setData] = useState({
     record: '',
     standing: '',
@@ -44,6 +46,23 @@ const Home = () => {
     };
 
     fetchData();
+  }, []);
+  useEffect(() => {
+    const fetchTentsCount = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        const tents = response.data;
+        setData(prevData => ({ ...prevData, numTents: tents.length }));
+      } catch (error) {
+        console.error('Error fetching tent count:', error);
+      }
+    };
+
+    fetchTentsCount();
   }, []);
 
   return (
