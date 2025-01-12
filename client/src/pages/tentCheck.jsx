@@ -430,7 +430,13 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
                   <h2>Tent {tent.order}</h2>
                   <p><strong>Day Number:</strong> {tent.dayNumber}</p>
                   <p><strong>Night Number:</strong> {tent.nightNumber}</p>
-
+                  {tent.name && (
+                    <p>
+                      <strong className='tent-name'>
+                        {tent.name}
+                      </strong>
+                    </p>
+                  )}
                   <ul className="members-list">
                     {tent.members.split(',').map((rawMember) => {
                       const member = rawMember.trim();

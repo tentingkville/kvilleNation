@@ -332,13 +332,37 @@
   color: #001A57 ;
   text-decoration: none;
 }
+.tent-name{
+  color: #00539B;
+  font-size:large;
+}
+.cancel-check {
+  display: inline-block;    /* or block, if you want it on its own line */
+  width: 100%;              /* fill parent container width */
+  max-width: 200px;         /* optional: cap the max size so it doesn't stretch too far */
+  box-sizing: border-box;   /* ensures padding doesn't overflow the width */
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: white;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
+.cancel-check:hover {
+  background-color: #c82333; /* slightly darker red */
+}
+
 
 @media screen and (max-width: 768px) {
   .tent-check {
     padding: 15px;
     max-width: 95%;
   }
-
+  
   .tent-card {
     padding: 15px;
   }

@@ -242,6 +242,7 @@ app.get('/api/tent-checks', async (req, res) => {
       order: record.fields['Order'] || 0,
       captain: record.fields['Captain'] || '',
       members: record.fields['Members'] || '',
+      name: record.fields['Name'] || '',
       type: record.fields['Type'] || '',
       dayNumber: record.fields['Day Number'] || null,
       nightNumber: record.fields['Night Number'] || null,
