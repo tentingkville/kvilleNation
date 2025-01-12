@@ -143,7 +143,49 @@ export default function TentCheck() {
     const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
       withCredentials: true,
     });
-    const sortedTents = tentsResponse.data.sort((a, b) => a.order - b.order);
+    // In your code where you have tentsResponse.data:
+const sortedTents = tentsResponse.data.sort((a, b) => {
+  const strA = a.order;
+  const strB = b.order;
+
+  const isAlphaA = /^[A-Za-z]+$/.test(strA); // A, B, AA, etc.
+  const isAlphaB = /^[A-Za-z]+$/.test(strB);
+
+  // 1) If both are purely alphabetical
+  if (isAlphaA && isAlphaB) {
+    // (a) Compare by length first
+    if (strA.length !== strB.length) {
+      return strA.length - strB.length;
+    }
+    // (b) If same length, compare lexicographically
+    return strA.localeCompare(strB);
+  }
+
+  // 2) If exactly one is alphabetical, that one goes first
+  if (isAlphaA && !isAlphaB) {
+    return -1; // "alpha" < "numeric"
+  }
+  if (!isAlphaA && isAlphaB) {
+    return 1; // "numeric" > "alpha"
+  }
+
+  // 3) If both are numeric (or at least not purely alphabetical),
+  //    parse them as numbers and sort numerically.
+  //    (If they might be mixed alphanumeric like "A10", adapt this logic.)
+  const numA = parseInt(strA, 10);
+  const numB = parseInt(strB, 10);
+
+  // Fallback: if parseInt fails (NaN), treat them as strings
+  if (isNaN(numA) && isNaN(numB)) {
+    // neither is purely numeric -> fallback to normal string compare
+    return strA.localeCompare(strB);
+  }
+  if (isNaN(numA)) return 1;   // put non-numeric after numeric
+  if (isNaN(numB)) return -1;  // put numeric before non-numeric
+
+  // Both parse as numbers
+  return numA - numB;
+});
 
     // chunk them by groupIndex
     const chunkSize = Math.ceil(sortedTents.length / numCheckers);
