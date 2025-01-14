@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import axios from 'axios';
 import '../styles/tentCheck.css'; 
 import UserContext from '../userContext';
-
+import {debounce} from 'lodash';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const socket = io(API_BASE_URL, { withCredentials: true });
@@ -109,17 +109,11 @@ export default function TentCheck() {
   }, [isCheckStarted, tents]);
   const toggleExcludedName = (name) => {
     setExcludedNames((prev) => {
-      let newExcluded;
-      if (prev.includes(name)) {
-        // remove it
-        newExcluded = prev.filter((x) => x !== name);
-      } else {
-        // add it
-        newExcluded = [...prev, name];
-      }
-      // *** EMIT to server
-      socket.emit('excludedNamesUpdated', newExcluded);
-      return newExcluded; 
+      const updated = prev.includes(name)
+        ? prev.filter((n) => n !== name)
+        : [...prev, name];
+      debounceEmit('excludedNamesUpdated', updated); // Debounced emit
+      return updated;
     });
   };
   const getCurrentDateTime = () => {
@@ -137,82 +131,33 @@ export default function TentCheck() {
   };
   const handleStartCheck = async () => {
     if (isCheckStarted) {
-      alert('A check has already started.');
+      alert('A check is already in progress.');
       return;
     }
-    // Re-fetch tents
-    const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
-      withCredentials: true,
-    });
-    // In your code where you have tentsResponse.data:
-const sortedTents = tentsResponse.data.sort((a, b) => {
-  const strA = a.order;
-  const strB = b.order;
-
-  const isAlphaA = /^[A-Za-z]+$/.test(strA); // A, B, AA, etc.
-  const isAlphaB = /^[A-Za-z]+$/.test(strB);
-
-  // 1) If both are purely alphabetical
-  if (isAlphaA && isAlphaB) {
-    // (a) Compare by length first
-    if (strA.length !== strB.length) {
-      return strA.length - strB.length;
-    }
-    // (b) If same length, compare lexicographically
-    return strA.localeCompare(strB);
-  }
-
-  // 2) If exactly one is alphabetical, that one goes first
-  if (isAlphaA && !isAlphaB) {
-    return -1; // "alpha" < "numeric"
-  }
-  if (!isAlphaA && isAlphaB) {
-    return 1; // "numeric" > "alpha"
-  }
-
-  // 3) If both are numeric (or at least not purely alphabetical),
-  //    parse them as numbers and sort numerically.
-  //    (If they might be mixed alphanumeric like "A10", adapt this logic.)
-  const numA = parseInt(strA, 10);
-  const numB = parseInt(strB, 10);
-
-  // Fallback: if parseInt fails (NaN), treat them as strings
-  if (isNaN(numA) && isNaN(numB)) {
-    // neither is purely numeric -> fallback to normal string compare
-    return strA.localeCompare(strB);
-  }
-  if (isNaN(numA)) return 1;   // put non-numeric after numeric
-  if (isNaN(numB)) return -1;  // put numeric before non-numeric
-
-  // Both parse as numbers
-  return numA - numB;
-});
-
-    // chunk them by groupIndex
-    const chunkSize = Math.ceil(sortedTents.length / numCheckers);
-    let assignedTents = [...sortedTents];
-    for (let i = 0; i < numCheckers; i++) {
-      const start = i * chunkSize;
-      const end = start + chunkSize;
-      const groupTents = assignedTents.slice(start, end);
-      groupTents.forEach((tent) => {
-        tent.groupIndex = i;
-      });
-    }
-
-    setTents(assignedTents);
-    setIsCheckStarted(true);
-
+  
     try {
+      const response = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
+        withCredentials: true,
+      });
+  
+      const sortedTents = response.data.sort((a, b) =>
+        a.order.localeCompare(b.order, 'en', { numeric: true })
+      );
+  
+      const chunkSize = Math.ceil(sortedTents.length / numCheckers);
+      const assignedTents = sortedTents.map((tent, index) => ({
+        ...tent,
+        groupIndex: Math.floor(index / chunkSize),
+      }));
+  
+      setTents(assignedTents);
+      setIsCheckStarted(true);
+  
       await axios.post(
         `${API_BASE_URL}/api/start-check`,
-        {
-          tents: assignedTents,
-          numCheckers,
-        },
+        { tents: assignedTents, numCheckers },
         { withCredentials: true }
       );
-      alert('Check started!');
     } catch (error) {
       console.error('Error starting check:', error);
     }
@@ -247,32 +192,29 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
       return newVal;
     });
   };
+  const debounceEmit = debounce((event, data) => {
+    socket.emit(event, data);
+  }, 200);
 
   const toggleSelection = (tentId, member) => {
     if (excludedNames.includes(member)) {
-      alert(`${member} is excluded by Duke Card Checker!`);
+      alert(`${member} is excluded!`);
       return;
     }
+  
     setSelectedMembers((prev) => {
       const selectedInTent = prev[tentId] || [];
-      let updated;
+      const updated = selectedInTent.includes(member)
+        ? {
+            ...prev,
+            [tentId]: selectedInTent.filter((m) => m !== member),
+          }
+        : {
+            ...prev,
+            [tentId]: [...selectedInTent, member],
+          };
   
-      if (selectedInTent.includes(member)) {
-        // Remove the member
-        updated = {
-          ...prev,
-          [tentId]: selectedInTent.filter((m) => m !== member),
-        };
-      } else {
-        // Add the member
-        updated = {
-          ...prev,
-          [tentId]: [...selectedInTent, member],
-        };
-      }
-  
-      socket.emit('selectedMembersUpdated', updated);
-  
+      debounceEmit('selectedMembersUpdated', updated); // Debounced emit
       return updated;
     });
   };
@@ -358,12 +300,30 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
     // 3) Return the 'lowest' - 'highest' range
     return `${firstOrder} - ${lastOrder}`;
   }
+  const MemberList = React.memo(({ members, tentId, toggleSelection, selectedMembers, excludedNames }) => (
+    <ul className="members-list">
+      {members.map((member) => (
+        <li
+          key={member}
+          className={
+            excludedNames.includes(member)
+              ? 'excluded'
+              : selectedMembers[tentId]?.includes(member)
+              ? 'selected'
+              : ''
+          }
+          onClick={() => toggleSelection(tentId, member)}
+        >
+          {member}
+        </li>
+      ))}
+    </ul>
+  ));
   return (
     <div className="tent-check">
       {!isCheckStarted ? (
         <div className="start-check">
           <h2>Start Tent Check</h2>
-          
           <label>How many checkers?</label>
           <div className="spinner-container">
             <button onClick={decrementCheckers} className="spinner-button">
@@ -373,10 +333,9 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
             <button onClick={incrementCheckers} className="spinner-button">
               +
             </button>
-    </div>
-
-        <button onClick={handleStartCheck}>Start Check</button>
-      </div>
+          </div>
+          <button onClick={handleStartCheck}>Start Check</button>
+        </div>
       ) : (
         <div>
           <button className="cancel-check" onClick={handleCancelCheck}>
@@ -384,14 +343,13 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
           </button>
           <div className="pagination">
             {[...Array(numCheckers + 1)].map((_, index) => {
-              const isDukePage = (index === numCheckers);
-
+              const isDukePage = index === numCheckers;
               let range = '';
-              // Only compute the range if it's NOT the Duke Card Checker
+  
               if (!isDukePage) {
                 range = getRangeForPage(index); // e.g. "A - U"
               }
-
+  
               return (
                 <button
                   key={index}
@@ -400,8 +358,7 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
                 >
                   {isDukePage
                     ? 'Duke Card Checker'
-                    : `Page ${index + 1} (${range})`
-                  }
+                    : `Page ${index + 1} (${range})`}
                 </button>
               );
             })}
@@ -412,7 +369,7 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
             <div className="duke-card-checker">
               <h2>Duke Card Checker</h2>
               <p>Select names to exclude (they will appear 'excluded' on other pages)</p>
-
+  
               <div className="search-bar">
                 <input
                   type="text"
@@ -421,7 +378,7 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
                   onChange={(e) => setDukeSearchTerm(e.target.value)}
                 />
               </div>
-
+  
               <ul>
                 {allMembers
                   .filter((name) =>
@@ -429,7 +386,7 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
                   )
                   .map((name) => {
                     const isExcluded = excludedNames.includes(name);
-
+  
                     return (
                       <li
                         key={name}
@@ -448,54 +405,32 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
               {tentsInCurrentPage.map((tent) => (
                 <div key={tent.id} id={`tent-${tent.id}`} className="tent-card">
                   <h2>Tent {tent.order}</h2>
-                  <p><strong>Day Number:</strong> {tent.dayNumber}</p>
-                  <p><strong>Night Number:</strong> {tent.nightNumber}</p>
+                  <p>
+                    <strong>Day Number:</strong> {tent.dayNumber}
+                  </p>
+                  <p>
+                    <strong>Night Number:</strong> {tent.nightNumber}
+                  </p>
                   {tent.name && (
                     <p>
-                      <strong className='tent-name'>
-                        {tent.name}
-                      </strong>
+                      <strong className="tent-name">{tent.name}</strong>
                     </p>
                   )}
-                  <ul className="members-list">
-                    {tent.members.split(',').map((rawMember) => {
-                      const member = rawMember.trim();
-                      const isExcluded = excludedNames.includes(member);
-                      const isSelected = selectedMembers[tent.id]?.includes(member);
-
-                      return (
-                        <li
-                          key={member}
-                          className={
-                            isExcluded
-                              ? 'excluded'
-                              : isSelected
-                                ? 'selected'
-                                : ''
-                          }
-                          onClick={() => {
-                            if (!isExcluded) {
-                              toggleSelection(tent.id, member);
-                            } else {
-                              alert(`${member} is excluded by Duke Card Checker!`);
-                            }
-                          }}
-                        >
-                          {member}
-                          {isSelected}
-                        </li>
-                      );
-                    })}
-                  </ul>
-
-        <div className="actions">
-          <button onClick={() => handleMiss(tent.id)}>Miss</button>
-          <button onClick={() => handleMake(tent.id)}>Make</button>
-        </div>
-      </div>
-    ))}
-  </div>
-)}
+                  <MemberList
+                    members={tent.members.split(',').map((m) => m.trim())}
+                    tentId={tent.id}
+                    toggleSelection={toggleSelection}
+                    selectedMembers={selectedMembers}
+                    excludedNames={excludedNames}
+                  />
+                  <div className="actions">
+                    <button onClick={() => handleMiss(tent.id)}>Miss</button>
+                    <button onClick={() => handleMake(tent.id)}>Make</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
