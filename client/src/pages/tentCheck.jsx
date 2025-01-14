@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import axios from 'axios';
 import '../styles/tentCheck.css'; 
 import UserContext from '../userContext';
-import debounce from 'lodash.debounce';
+
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const socket = io(API_BASE_URL, { withCredentials: true });
@@ -248,7 +248,7 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
     });
   };
 
-  const toggleSelection = debounce((tentId, member) => {
+  const toggleSelection = (tentId, member) => {
     if (excludedNames.includes(member)) {
       alert(`${member} is excluded by Duke Card Checker!`);
       return;
@@ -275,7 +275,7 @@ const sortedTents = tentsResponse.data.sort((a, b) => {
   
       return updated;
     });
-  }, 200);
+  };
 
   const handlePageChange = (pageIndex) => {
     setCurrentPage(pageIndex);
