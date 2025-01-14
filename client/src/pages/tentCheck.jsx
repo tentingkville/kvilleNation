@@ -110,6 +110,7 @@ export default function TentCheck() {
       setTents([]);
       setCurrentPage(0);
       localStorage.setItem('currentPage', 0);
+      setSelectedMembers({});
     });
 
     // *** New: Listen for 'checkEnded' ***
@@ -119,6 +120,7 @@ export default function TentCheck() {
       setCurrentPage(0);
       localStorage.setItem('currentPage', 0);
       alert('Check ended!');
+      setSelectedMembers({});
     });
     socket.on('excludedNamesUpdated', (serverExcluded) => {
       setExcludedNames(serverExcluded);
@@ -175,6 +177,7 @@ export default function TentCheck() {
     }
   
     try {
+      setSelectedMembers({});
       const response = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
         withCredentials: true,
       });

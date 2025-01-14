@@ -164,10 +164,12 @@ app.post('/api/cancel-check', (req, res) => {
     activeTents = [];
     numCheckers = 1;
     excludedNames = [];
+    selectedMembers = {}; 
 
     // Broadcast via Socket.IO
     io.emit('checkCanceled');
     io.emit('excludedNamesUpdated', excludedNames);
+    io.emit('selectedMembersUpdated', selectedMembers); 
     console.log('Check canceled successfully');
     return res.status(200).send('Check canceled successfully');
   } catch (error) {
@@ -182,10 +184,12 @@ app.post('/api/end-check', (req, res) => {
     activeTents = [];
     numCheckers = 1;
     excludedNames = [];
+    selectedMembers = {};
 
     // Broadcast via Socket.IO
     io.emit('checkEnded');
     io.emit('excludedNamesUpdated', excludedNames);
+    io.emit('selectedMembersUpdated', selectedMembers); // Notify clients
     console.log('Check ended successfully');
     return res.status(200).send('Check ended successfully');
   } catch (error) {
