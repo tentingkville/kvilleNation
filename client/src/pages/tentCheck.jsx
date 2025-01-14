@@ -23,6 +23,47 @@ export default function TentCheck() {
 
   const [dukeSearchTerm, setDukeSearchTerm] = useState('');
   const { user } = useContext(UserContext); 
+  const sortTents = (tents) => {
+    return tents.sort((a, b) => {
+      const strA = a.order;
+      const strB = b.order;
+  
+      const isAlphaA = /^[A-Za-z]+$/.test(strA); // A, B, AA, etc.
+      const isAlphaB = /^[A-Za-z]+$/.test(strB);
+  
+      const isNumericA = /^\d+$/.test(strA); // Numbers like 71, 72, etc.
+      const isNumericB = /^\d+$/.test(strB);
+  
+      // 1) If both are purely alphabetical
+      if (isAlphaA && isAlphaB) {
+        // (a) Compare by length first
+        if (strA.length !== strB.length) {
+          return strA.length - strB.length;
+        }
+        // (b) If same length, compare lexicographically
+        return strA.localeCompare(strB);
+      }
+  
+      // 2) If both are numeric, sort numerically
+      if (isNumericA && isNumericB) {
+        return parseInt(strA, 10) - parseInt(strB, 10);
+      }
+  
+      // 3) If one is alphabetical and the other numeric
+      if (isAlphaA && isNumericB) return -1; // Alphabetical comes first
+      if (isNumericA && isAlphaB) return 1; // Numeric comes last
+  
+      // 4) If one is alphabetical and the other is alphanumeric
+      const isAlphaNumericA = /^[A-Za-z0-9]+$/.test(strA);
+      const isAlphaNumericB = /^[A-Za-z0-9]+$/.test(strB);
+  
+      if (isAlphaA && isAlphaNumericB) return -1; // Alphabetical comes first
+      if (isAlphaNumericA && isAlphaB) return 1; // Alphanumeric comes after pure alphabetical
+  
+      // 5) Fallback to lexicographical comparison
+      return strA.localeCompare(strB);
+    });
+  };
   // 1) On mount: fetch data, listen to sockets
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -31,42 +72,7 @@ export default function TentCheck() {
         const tentsResponse = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
           withCredentials: true,
         });
-        const sortedTents = tentsResponse.data.sort((a, b) => {
-          const strA = a.order;
-          const strB = b.order;
-          const isAlphaA = /^[A-Za-z]+$/.test(strA); // A, B, AA, etc.
-          const isAlphaB = /^[A-Za-z]+$/.test(strB);
-          // 1) If both are purely alphabetical
-          if (isAlphaA && isAlphaB) {
-            // (a) Compare by length first
-            if (strA.length !== strB.length) {
-              return strA.length - strB.length;
-            }
-            // (b) If same length, compare lexicographically
-            return strA.localeCompare(strB);
-          }
-          // 2) If exactly one is alphabetical, that one goes first
-          if (isAlphaA && !isAlphaB) {
-            return -1; // "alpha" < "numeric"
-          }
-          if (!isAlphaA && isAlphaB) {
-            return 1; // "numeric" > "alpha"
-          }
-          // 3) If both are numeric (or at least not purely alphabetical),
-          //    parse them as numbers and sort numerically.
-          //    (If they might be mixed alphanumeric like "A10", adapt this logic.)
-          const numA = parseInt(strA, 10);
-          const numB = parseInt(strB, 10);
-          // Fallback: if parseInt fails (NaN), treat them as strings
-          if (isNaN(numA) && isNaN(numB)) {
-            // neither is purely numeric -> fallback to normal string compare
-            return strA.localeCompare(strB);
-          }
-          if (isNaN(numA)) return 1;   // put non-numeric after numeric
-          if (isNaN(numB)) return -1;  // put numeric before non-numeric
-          // Both parse as numbers
-          return numA - numB;
-        });
+        const sortedTents = sortTents(tentsResponse.data);
         // check if a check is in progress
         const checkResponse = await axios.get(`${API_BASE_URL}/api/check-status`, {
           withCredentials: true,
@@ -173,9 +179,7 @@ export default function TentCheck() {
         withCredentials: true,
       });
   
-      const sortedTents = response.data.sort((a, b) =>
-        a.order.localeCompare(b.order, 'en', { numeric: true })
-      );
+      const sortedTents = sortTents(response.data);
   
       const chunkSize = Math.ceil(sortedTents.length / numCheckers);
       const assignedTents = sortedTents.map((tent, index) => ({
