@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback} from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import '../styles/tentCheck.css'; 
 import UserContext from '../userContext';
 import {debounce} from 'lodash';
+import { flushSync } from 'react-dom';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const socket = io(API_BASE_URL, { withCredentials: true });
@@ -126,7 +127,10 @@ export default function TentCheck() {
       setExcludedNames(serverExcluded);
     });
     socket.on('selectedMembersUpdated', (serverSelected) => {
-      setSelectedMembers(serverSelected);
+      setSelectedMembers((prev) => ({
+        ...prev,
+        ...serverSelected,
+      }));
     });
 
     return () => {
@@ -148,15 +152,18 @@ export default function TentCheck() {
       // The server will emit 'checkEnded', which resets everything
     }
   }, [isCheckStarted, tents]);
-  const toggleExcludedName = (name) => {
-    setExcludedNames((prev) => {
-      const updated = prev.includes(name)
-        ? prev.filter((n) => n !== name)
-        : [...prev, name];
-      debounceEmit('excludedNamesUpdated', updated); // Debounced emit
-      return updated;
-    });
-  };
+  const toggleExcludedName = useCallback(
+    debounce((name) => {
+      setExcludedNames((prev) => {
+        const updated = prev.includes(name)
+          ? prev.filter((n) => n !== name)
+          : [...prev, name];
+        debounceEmit('excludedNamesUpdated', updated); // Debounced emit
+        return updated;
+      });
+    }, 200),
+    []
+  );
   const getCurrentDateTime = () => {
     const dateTimeStr = new Intl.DateTimeFormat('en-US', {
       timeZone: 'America/New_York',
@@ -232,10 +239,12 @@ export default function TentCheck() {
       return newVal;
     });
   };
-  const debounceEmit = debounce((event, data) => {
-    socket.emit(event, data);
-  }, 200);
-
+  const debounceEmit = useCallback(
+    debounce((event, data) => {
+      socket.emit(event, data);
+    }, 300),
+    []
+  );
   const toggleSelection = (tentId, member) => {
     if (excludedNames.includes(member)) {
       alert(`${member} is excluded!`);
@@ -245,16 +254,10 @@ export default function TentCheck() {
     setSelectedMembers((prev) => {
       const selectedInTent = prev[tentId] || [];
       const updated = selectedInTent.includes(member)
-        ? {
-            ...prev,
-            [tentId]: selectedInTent.filter((m) => m !== member),
-          }
-        : {
-            ...prev,
-            [tentId]: [...selectedInTent, member],
-          };
+        ? { ...prev, [tentId]: selectedInTent.filter((m) => m !== member) }
+        : { ...prev, [tentId]: [...selectedInTent, member] };
   
-      debounceEmit('selectedMembersUpdated', updated); // Debounced emit
+      debounceEmit('selectedMembersUpdated', updated); // Emit the updated state
       return updated;
     });
   };
@@ -340,25 +343,26 @@ export default function TentCheck() {
     // 3) Return the 'lowest' - 'highest' range
     return `${firstOrder} - ${lastOrder}`;
   }
-  const MemberList = React.memo(({ members, tentId, toggleSelection, selectedMembers, excludedNames }) => (
-    <ul className="members-list">
-      {members.map((member) => (
-        <li
-          key={member}
-          className={
-            excludedNames.includes(member)
-              ? 'excluded'
-              : selectedMembers[tentId]?.includes(member)
-              ? 'selected'
-              : ''
-          }
-          onClick={() => toggleSelection(tentId, member)}
-        >
-          {member}
-        </li>
-      ))}
-    </ul>
-  ));
+  const MemberList = React.memo(({ members, tentId, toggleSelection, selectedMembers, excludedNames }) => {
+    return (
+      <ul className="members-list">
+        {members.map((member) => {
+          const isSelected = selectedMembers[tentId]?.includes(member);
+          const isExcluded = excludedNames.includes(member);
+  
+          return (
+            <li
+              key={member}
+              className={isExcluded ? 'excluded' : isSelected ? 'selected' : ''}
+              onClick={() => toggleSelection(tentId, member)}
+            >
+              {member}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  });
   return (
     <div className="tent-check">
       {!isCheckStarted ? (
