@@ -414,30 +414,3 @@
     font-size: 10px;
   }
 }
-@media screen and (max-width: 768px) {
-  .tent-card:hover,
-  .actions button:hover,
-  .pagination button:hover,
-  .start-check button:hover,
-  .cancel-check:hover {
-    transform: none;
-    box-shadow: none;
-    opacity: 1;
-  }
-}
-.members-list li:hover {
-  background-color: unset;
-  transform: unset;
-  box-shadow: unset;
-  opacity: unset;
-}
-
-@media screen and (max-width: 768px), (hover: none), (pointer: coarse) {
-  .tent-check .members-list li:hover {
-    background-color: unset !important;
-    transform: unset !important;
-    box-shadow: unset !important;
-    opacity: unset !important;
-    cursor: default !important; /* Optional: neutralize cursor */
-  }
-}
