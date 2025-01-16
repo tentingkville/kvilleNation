@@ -124,9 +124,9 @@
   cursor: pointer;
 }
 
-.members-list li:hover {
+/* .members-list li:hover {
   background-color: #e0e7f1;
-}
+} */
 
 .members-list li.selected {
   background-color: #001A57;
@@ -416,7 +416,6 @@
 }
 @media screen and (max-width: 768px) {
   .tent-card:hover,
-  .members-list li:hover,
   .actions button:hover,
   .pagination button:hover,
   .start-check button:hover,
@@ -424,5 +423,21 @@
     transform: none;
     box-shadow: none;
     opacity: 1;
+  }
+}
+.members-list li:hover {
+  background-color: unset;
+  transform: unset;
+  box-shadow: unset;
+  opacity: unset;
+}
+
+@media screen and (max-width: 768px), (hover: none), (pointer: coarse) {
+  .tent-check .members-list li:hover {
+    background-color: unset !important;
+    transform: unset !important;
+    box-shadow: unset !important;
+    opacity: unset !important;
+    cursor: default !important; /* Optional: neutralize cursor */
   }
 }
