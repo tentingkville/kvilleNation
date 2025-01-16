@@ -124,9 +124,9 @@
   cursor: pointer;
 }
 
-.members-list li:hover {
+/* .members-list li:hover {
   background-color: #e0e7f1;
-}
+} */
 
 .members-list li.selected {
   background-color: #001A57;
