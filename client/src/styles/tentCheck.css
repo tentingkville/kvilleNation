@@ -404,7 +404,6 @@
   .tent-card {
     padding: 10px;
   }
-
   .members-list li {
     padding: 8px;
     font-size: 12px;
@@ -413,5 +412,15 @@
   .actions button {
     padding: 5px 10px;
     font-size: 10px;
+  }
+}
+@media (hover: none) {
+  .pagination button:hover,
+  .tent-card:hover,
+  .members-list li:hover,
+  .actions button:hover {
+    opacity: 1;
+    transform: none;
+    box-shadow: none;
   }
 }
