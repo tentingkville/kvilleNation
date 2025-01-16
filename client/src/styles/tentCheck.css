@@ -124,9 +124,9 @@
   cursor: pointer;
 }
 
-/* .members-list li:hover {
+.members-list li:hover {
   background-color: #e0e7f1;
-} */
+}
 
 .members-list li.selected {
   background-color: #001A57;
@@ -381,8 +381,8 @@
   }
 
   .members-list li {
-    padding: 8px 10px;
-    font-size: 14px;
+    padding: 12px 10px;
+    font-size: 16px;
   }
 
   .actions button {
