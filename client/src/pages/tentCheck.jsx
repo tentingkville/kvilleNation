@@ -20,8 +20,6 @@ export default function TentCheck() {
     parseInt(localStorage.getItem('currentPage')) || 0
   );
   const [excludedNames, setExcludedNames] = useState([]);
-  // total pages = actual checkers + 1 for the "Duke Card Checker"
-
   const [dukeSearchTerm, setDukeSearchTerm] = useState('');
   const { user } = useContext(UserContext); 
   const sortTents = (tents) => {
@@ -126,12 +124,7 @@ export default function TentCheck() {
     socket.on('excludedNamesUpdated', (serverExcluded) => {
       setExcludedNames(serverExcluded);
     });
-    socket.on('selectedMembersUpdated', (serverSelected) => {
-      setSelectedMembers((prev) => ({
-        ...prev,
-        ...serverSelected,
-      }));
-    });
+
 
     return () => {
       socket.off('checkStarted');
@@ -242,26 +235,34 @@ export default function TentCheck() {
   const debounceEmit = useCallback(
     debounce((event, data) => {
       socket.emit(event, data);
-    }, 300),
+    }, 200),
     []
   );
   const toggleSelection = (tentId, member) => {
+    // If the member is in excludedNames, bail out
     if (excludedNames.includes(member)) {
       alert(`${member} is excluded!`);
       return;
     }
   
+    // Update the local selectedMembers state
     setSelectedMembers((prev) => {
       const selectedInTent = prev[tentId] || [];
-      const updated = selectedInTent.includes(member)
-        ? { ...prev, [tentId]: selectedInTent.filter((m) => m !== member) }
-        : { ...prev, [tentId]: [...selectedInTent, member] };
-  
-      debounceEmit('selectedMembersUpdated', updated); // Emit the updated state
-      return updated;
+      if (selectedInTent.includes(member)) {
+        // If already selected, unselect
+        return {
+          ...prev,
+          [tentId]: selectedInTent.filter((m) => m !== member),
+        };
+      } else {
+        // Otherwise, add this member to the selection
+        return {
+          ...prev,
+          [tentId]: [...selectedInTent, member],
+        };
+      }
     });
   };
-
   const handlePageChange = (pageIndex) => {
     setCurrentPage(pageIndex);
     localStorage.setItem('currentPage', pageIndex);
