@@ -232,16 +232,38 @@ app.post('/api/tent-checks/update', async (req, res) => {
 // Route to get tent data
 app.get('/api/tent-checks', async (req, res) => {
   try {
-    const response = await axios.get(
-      `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_ID}`,
-      {
+    let allRecords = [];
+    let offset; // Will store the 'offset' returned by Airtable for pagination
+    
+    do {
+      // Build a config object to pass optional `offset` param if present
+      const config = {
         headers: {
           Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
         },
+        params: {},
+      };
+      if (offset) {
+        config.params.offset = offset;
       }
-    );
-
-    const tents = response.data.records.map((record) => ({
+      
+      // Fetch from Airtable
+      const response = await axios.get(
+        `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_ID}`,
+        config
+      );
+      
+      const { records = [], offset: newOffset } = response.data;
+      
+      // Combine this page of records with our running list
+      allRecords = allRecords.concat(records);
+      
+      // If Airtable returns an offset, it means there are more records
+      offset = newOffset;
+    } while (offset);
+    
+    // Now `allRecords` contains all records from *all* pages
+    const tents = allRecords.map((record) => ({
       id: record.id,
       order: record.fields['Order'] || 0,
       captain: record.fields['Captain'] || '',
@@ -257,7 +279,9 @@ app.get('/api/tent-checks', async (req, res) => {
       dateOfLastMiss: record.fields['Date of Last Miss'] || null,
     }));
 
+    // Sort by the 'Order' field (numeric sort if you want strictly numeric ordering)
     tents.sort((a, b) => a.order - b.order);
+
     return res.json(tents);
   } catch (error) {
     console.error('Error fetching tent data from Airtable:', error.response?.data || error.message);
