@@ -6,7 +6,7 @@ const MongoStore = require('connect-mongo');
 require('dotenv').config();
 const UserRoute = require('./routes/userRoutes');
 const { getAirtableConfig } = require('./lib/airtableConfig');
-
+const path = require('path');
 const http = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
@@ -302,6 +302,8 @@ app.get('/', (req, res) => {
 app.use('/api/profile', UserRoute);
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/airtable-config', require('./routes/airtableConfigRoutes'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // serve files
+app.use('/api/files', require('./routes/fileRoutes'));       
 /**
  * START THE SERVER IF LOCAL
  */

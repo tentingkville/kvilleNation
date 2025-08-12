@@ -4,6 +4,10 @@ import Toast from '../lmDashboardComponents/toast.jsx';
 import SearchBox from "../lmDashboardComponents/searchBox.jsx";
 import UsersTable from '../lmDashboardComponents/usersTable.jsx';
 import AirtableConfigForm from '../lmDashboardComponents/airtableConfig.jsx';
+import SectionHeader from '../lmDashboardComponents/sectionHeader.jsx';
+import RoleStats from '../lmDashboardComponents/roleStats.jsx';
+import CheckStatus from '../lmDashboardComponents/checkStatus.jsx';
+import FileUploadCard from '../lmDashboardComponents/fileUploadCard.jsx';
 
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -72,19 +76,49 @@ export default function LmDashboard() {
 
   return (
     <div className="lm-dashboard">
+
       <h1>Line Monitor Dashboard</h1>
       <Toast type="success" message={successMessage} />
       <Toast type="error" message={errorMessage} />
-      <h2 style={{ marginTop: '2rem' }}>Users</h2>
+      <SectionHeader title="Overview" subtitle="Quick stats for this season" />
+      <RoleStats users={users} />
+
+      <SectionHeader title="Tent Check Status" subtitle="See current check activity" />
+      <CheckStatus
+        onSuccess={(m) => { setSuccessMessage(m); setErrorMessage(''); }}
+        onError={(m) => { setErrorMessage(m); setSuccessMessage(''); }}
+      />
+      <h2 style={{ marginTop: '1rem' }}>Users</h2>
 
       <SearchBox placeholder="Search users..." value={userSearchTerm} onChange={setUserSearchTerm} />
 
       <UsersTable users={filteredUsers} onToggleRole={handleToggleRole} />
-      <h2 style={{ marginTop: '2rem' }}>Airtable Settings</h2>
-        <AirtableConfigForm
-          onSuccess={(msg) => { setSuccessMessage(msg); setErrorMessage(''); }}
-          onError={(msg) => { setErrorMessage(msg); setSuccessMessage(''); }}
-        />
+      <SectionHeader title="Airtable Settings" subtitle="Rotate keys yearly and update Base/Table IDs" />
+      <AirtableConfigForm
+        onSuccess={(m) => { setSuccessMessage(m); setErrorMessage(''); }}
+        onError={(m) => { setErrorMessage(m); setSuccessMessage(''); }}
+      />
+      <h2 style={{ marginTop: '1.5rem' }}>File Uploads</h2>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: -20 }}>
+          <div style={{ flex: '1 1 300px' }}>
+            <FileUploadCard
+              title="Policy PDF"
+              uploadPath="/api/files/policy"
+              accept="application/pdf"
+              onSuccess={(m) => { setSuccessMessage(m); setErrorMessage(''); }}
+              onError={(m) => { setErrorMessage(m); setSuccessMessage(''); }}
+            />
+          </div>
+          <div style={{ flex: '1 1 300px' }}>
+            <FileUploadCard
+              title="Calendar PDF"
+              uploadPath="/api/files/calendar"
+              accept="application/pdf"
+              onSuccess={(m) => { setSuccessMessage(m); setErrorMessage(''); }}
+              onError={(m) => { setErrorMessage(m); setSuccessMessage(''); }}
+            />
+          </div>
+        </div>
     </div>
   );
 }
