@@ -16,10 +16,26 @@ const Home = () => {
     rank: '',
     numTents: 0,
   });
-  const handleRegisterClick = () => {
-    window.location.href = 'https://urldefense.com/v3/__https://airtable.com/appbGqvufDAWCGhHt/pagNNgAB0Gmk9eEUw/form__;!!OToaGQ!uTOLWvujpA-zomUgetPUhJ7jgQVYQJvs2MX3cfIa0-p3CApd4njiOQZvP9LvrT9LIMZDHUmPVYNYx7SsMITUg4cpWShg$';
-  };
+  const [tentLink, setTentLink] = useState('');
+  const [linkActive, setLinkActive] = useState(false);
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/tent-link`)
+      .then(res => res.json())
+      .then(linkData => {
+        setTentLink(linkData.url || '');
+        setLinkActive(linkData.active ?? false);
+      })
+      .catch(() => {});
+  }, []);
 
+
+  const handleRegisterClick = () => {
+    if (tentLink) {
+      window.location.href = tentLink;
+    } else {
+      alert('Tent registration link is not set yet.');
+    }
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -98,24 +114,32 @@ const Home = () => {
                 </div>
             </div>
         </div>
-        <div className="content-row"> 
-          <div className="bubble-container">
-            <button className="register-button" onClick={handleRegisterClick}>
-              Register a Tent!
+        {/* MEDIA SECTION: 
+            Row 1 => [ Register | (spans 2 cols) Spotify ]
+            Row 2 => [ IG | IG | Spotify ] */}
+        <div className="media-grid">
+          <div className="register-card">
+            <button
+              className="register-button"
+              onClick={handleRegisterClick}
+              disabled={!linkActive}
+            >
+              {linkActive ? "Register a Tent!" : "Registration Closed"}
             </button>
           </div>
-          <div className="bubble-container-spotify">
+
+          <div className="ig-card final-home-row">
+            <InstagramEmbedKvilleNation />
+          </div>
+
+          <div className="ig-card final-home-row">
+            <InstagramEmbedDukeMBB />
+          </div>
+
+          <div className="spotify-card bubble-container-spotify">
             <SpotifyEmbed />
           </div>
         </div>
-        <div className="embeds-row"> 
-        <div className="final-home-row">
-          <InstagramEmbedKvilleNation />
-        </div>
-        <div className='final-home-row'>
-          <InstagramEmbedDukeMBB />
-        </div>
-      </div>
     </div>
     </>
     );

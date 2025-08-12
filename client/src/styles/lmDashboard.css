@@ -313,3 +313,31 @@ table tbody tr:hover {
   outline: 2px solid #80bdff;
   outline-offset: 2px;
 }
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 15px; 
+  margin-top: 10px;
+  margin-left: 5px
+}
+
+.toggle-label {
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.toggle-container .slider {
+  scale: 1.25;
+  margin-top: auto;
+}
+
+.toggle-label.active {
+  color: #28a745; 
+}
+.toggle-label.inactive {
+    color: #dc3545; 
+}
+.lm-dashboard .stats-row {
+      grid-template-columns: repeat(3, 1fr);
+}

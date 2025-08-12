@@ -77,8 +77,6 @@ export default function CheckStatus({ onSuccess, onError, autoRefreshMs = 10000 
           Refresh
         </button>
       </div>
-
-      {loading ? <small>Loading status…</small> : null}
     </div>
   );
 }

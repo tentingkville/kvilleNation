@@ -1,117 +1,175 @@
-.all-of-home:not(.register-button) {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
+/* Layout shell */
+.all-of-home {
   max-width: 1200px;
-  margin: auto;
-  padding-bottom: 30px;
+  margin: 0 auto;
+  padding: 16px;
 }
-.bubble-container {
-  background-color: white;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-  margin-top: 20px;
-  max-width: 1200px;
+
+/* Bubbles / cards */
+.bubble-container,
+.bubble-container-spotify,
+.final-home-row,
+.register-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  padding: 16px;
+  margin-top: 16px;
 }
-.bubble-container-spotify {
-  background-color: white;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-  margin-top: 20px;
-  max-width: 400px;
-  width: 100%;
-}
-.stats-row {
-  display: flex;
-  justify-content: space-around;
-  text-align: center;
-  padding: 10px 0;
-}
-.stat-box {
-  padding: 10px;
-}
+
+/* Header banner */
 .header img {
+  display: block;
   width: 100%;
   height: auto;
   border-radius: 10px;
 }
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+@media (max-width: 960px) {
+  .stats-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+.stat-box {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+.stat-box > div:first-child {
+  font-size: .85rem;
+  color: #6c757d;
+  letter-spacing: .02em;
+}
 .dukeStats {
-  display: flex;
-  justify-content: space-around;
-  text-align: center;
+  font-size: 1.4rem;
   font-weight: 700;
-  font-size: x-large;
-  margin-top: 10px;
+  color: #1b1e21;
+  margin-top: 4px;
 }
-.content-row {
+
+/* ================================
+   MEDIA GRID
+   Row 1: [ Register |      Spotify      ]  <-- Register spans col 1-2, Spotify is col 3 (spans 2 rows)
+   Row 2: [   IG     |        IG         |  Spotify ]
+   ===================================== */
+.media-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: start;
+  column-gap: 16px;
+  row-gap: 4px;  
+}
+
+/* Register card: row 1, spans columns 1-2 */
+.media-grid .register-card {
+  grid-column: 1 / span 2;
+  grid-row: 1;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
 }
-.final-home-row {
-  background-color: white;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-  max-width: 400px;
-  margin-top: -420px;
+
+/* Spotify card: right column, spans both rows */
+.media-grid .spotify-card {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  min-width: 0; /* prevent overflow in grid */
   height: 100%;
 }
-.final-home-row, .bubble-container-spotify {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+
+/* IG cards: row 2, columns 1 and 2 */
+.media-grid .ig-card:nth-of-type(1) { /* first IG inside media-grid */
+  grid-column: 1;
+  grid-row: 2;
 }
-.embeds-row {
-  display: flex;
-  align-items: stretch;
-  gap: 50px;
-  flex-wrap: wrap;
+.media-grid .ig-card:nth-of-type(2) { /* second IG inside media-grid */
+  grid-column: 2;
+  grid-row: 2;
 }
-.register-button {
-  background-color: #45bc49;
-  border: none;
-  color: white;
-  padding: 20px 303px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 20px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-.register-button:hover {
-  background-color: #3f9e3f;
-}
-@media (max-width: 768px) {
-  .embeds-row {
-    flex-direction: column; 
-    gap: 15px; 
-}
-  .content-row, .embeds-row {
-    flex-direction: column;
-    align-items: center;
+
+/* Responsive: tablet */
+@media (max-width: 1100px) {
+  .media-grid {
+    grid-template-columns: 1fr 1fr; /* two columns */
   }
-  .final-home-row, .bubble-container-spotify {
-    max-width: 100%;
-    margin-top: 20px;
+  .media-grid .register-card {
+    grid-column: 1 / -1; /* full width on top */
+  }
+  .media-grid .spotify-card {
+    grid-column: 1 / -1; /* full width below */
+    grid-row: auto;
     height: auto;
   }
-  .register-button {
-    padding: 20px;
-    width: 100%;
+  .media-grid .ig-card:nth-of-type(1) {
+    grid-column: 1;
+    grid-row: auto;
   }
-  .bubble-container {
-    margin: 10px 0;
-    width: 100%;
+  .media-grid .ig-card:nth-of-type(2) {
+    grid-column: 2;
+    grid-row: auto;
+  }
+}
 
+/* Phone: single column stack */
+@media (max-width: 700px) {
+  .media-grid {
+    grid-template-columns: 1fr;
   }
-  .stats-row, .stat-box {
-    flex-direction: column;
-    text-align: center;
+  .media-grid .register-card,
+  .media-grid .spotify-card,
+  .media-grid .ig-card:nth-of-type(1),
+  .media-grid .ig-card:nth-of-type(2) {
+    grid-column: 1;
+    grid-row: auto;
   }
+}
+
+/* Register button (compact) */
+.register-button {
+  width: 100%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: .5rem;
+  padding: 12px 21px;
+  border-radius: 10px;
+  border: 1px solid #0a66e6;
+  background: #007bff;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform .06s ease, background-color .2s ease, box-shadow .2s ease, opacity .2s;
+  box-shadow: 0 6px 14px rgba(0,123,255,.18);
+}
+.register-button:hover:not(:disabled) {
+  background: #0056b3;
+  box-shadow: 0 8px 18px rgba(0,86,179,.22);
+}
+.register-button:active:not(:disabled) { transform: translateY(1px); }
+.register-button:focus-visible { outline: 3px solid rgba(0,123,255,.35); outline-offset: 2px; }
+.register-button:disabled {
+  background: #e9ecef;
+  border-color: #dee2e6;
+  color: #6c757d;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: .85;
+}
+
+/* Minor polish */
+.bubble-container-spotify iframe {
+  width: 100%;
+  border-radius: 8px;
 }
