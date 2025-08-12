@@ -1,4 +1,3 @@
-/* General Dashboard Styles */
 .lm-dashboard {
     font-family: Arial, sans-serif;
     padding: 20px;
@@ -124,131 +123,96 @@ table tbody tr:hover {
     transform: translateX(14px);
 }
 
-/* Events Section */
-.events-section {
+/* Airtable Config Section */
+.airtable-config {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
     margin-top: 30px;
-  }
-  
-  .events-section h2 {
-    text-align: center;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .event-search-container {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.airtable-config .form-row {
     display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  
-  .event-search-container input {
-    width: 50%;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.airtable-config label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.airtable-config input[type="text"],
+.airtable-config input[type="password"] {
     padding: 10px;
     font-size: 1rem;
     border: 1px solid #ddd;
     border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .event-search-container input:focus {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.airtable-config input:focus {
     outline: none;
     border-color: #007bff;
     background-color: #eef6ff;
-  }
-  
-  /* Event Form */
-  .event-form {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  .event-form button {
-    grid-column: 1 / -1;
-    padding: 12px 20px;
-    font-size: 1rem;
+}
+
+.airtable-config .input-with-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.airtable-config .input-with-toggle input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.airtable-config button {
+    padding: 10px 16px;
+    font-size: 0.95rem;
     font-weight: bold;
-    color: white;
-    background-color: #007bff;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    text-align: center;
-    justify-self: center;
-  }
-  
-  .event-form button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Event Table */
-  .event-table-wrapper {
-    margin-top: 20px;
-    overflow-x: auto;
-    max-height: 400px;
-    overflow-y: auto;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .event-table-wrapper table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .event-table-wrapper th,
-  .event-table-wrapper td {
-    text-align: left;
-    padding: 12px;
-    border: 1px solid #ddd;
-  }
-  
-  .event-table-wrapper th {
+}
+
+.airtable-config button:not(.secondary) {
+    color: white;
     background-color: #007bff;
-    color: white;
-    font-weight: bold;
-  }
-  
-  .event-table-wrapper tbody tr:nth-child(odd) {
-    background-color: #f9f9f9;
-  }
-  
-  .event-table-wrapper tbody tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  /* Buttons in Table */
-  .event-table-wrapper .edit-btn {
-    background-color: #ffc107;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 5px;
-  }
-  
-  .event-table-wrapper .delete-btn {
-    background-color: #dc3545;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .event-table-wrapper .edit-btn:hover {
-    background-color: #e0a800;
-  }
-  
-  .event-table-wrapper .delete-btn:hover {
-    background-color: #c82333;
-  }
+}
+
+.airtable-config button:not(.secondary):hover {
+    background-color: #0056b3;
+}
+
+.airtable-config button.secondary {
+    background-color: #e0e0e0;
+    color: #333;
+    /* margin-top: -20px; */
+}
+.airtable-config button.showSecondary {
+    background-color: #e0e0e0;
+    color: #333;
+    margin-top: -20px;
+    margin-left: 10px;
+}
+.airtable-config button.showSecondary:hover {
+    background-color: #c2c2c2;
+}
+.airtable-config button.secondary:hover {
+    background-color: #c2c2c2;
+}
+
+.airtable-config small {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.airtable-config .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}

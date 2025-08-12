@@ -7,7 +7,7 @@ router.get('/tents', async (req, res) => {
         const tents = await Tent.find({});
         res.json(tents);
     } catch (error) {
-        console.error(error);  // Log the error for debugging
+        console.error(error);  
         res.status(500).send('Server error');
     }
 });

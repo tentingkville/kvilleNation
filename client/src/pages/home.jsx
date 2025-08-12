@@ -29,9 +29,9 @@ const Home = () => {
         const teamData = response.data.team;
 
         let record = teamData.record.items[0].summary || '0-0';
-        let standing = teamData.standingSummary || '';
-        let nextOpponent = '';
-        let rank = teamData.rank || '';
+        let standing = teamData.standingSummary || 'TBD';
+        let nextOpponent = 'TBD';
+        let rank = teamData.rank || 'TBD';
 
         const homeTeam = teamData.nextEvent[0].competitions[0].competitors[0].team.displayName;
         const awayTeam = teamData.nextEvent[0].competitions[0].competitors[1].team.displayName;
@@ -78,23 +78,23 @@ const Home = () => {
             <div className="stats-row">
                 <div className="stat-box">
                 <div>AP RANK</div>
-                <div className='dukeStats'>{data.rank}</div>
+                <div className='dukeStats'>{data.rank || "TBD"}</div>
                 </div>
                 <div className="stat-box">
                 <div>RECORD</div>
-                <div className='dukeStats'>{data.record}</div>
+                <div className='dukeStats'>{data.record || "0-0"}</div>
                 </div>
                 <div className="stat-box">
                 <div>STANDING</div>
-                <div className='dukeStats'>{data.standing}</div>
+                <div className='dukeStats'>{data.standing || "TBD"}</div>
                 </div>
                 <div className="stat-box">
                 <div>NEXT OPPONENT</div>
-                <div className='dukeStats'>{data.nextOpponent}</div>
+                <div className='dukeStats'>{data.nextOpponent || "TBD"}</div>
                 </div>
                 <div className="stat-box">
                 <div>NUMBER OF TENTS IN K-VILLE</div>
-                <div className='dukeStats'>{data.numTents}</div>
+                <div className='dukeStats'>{data.numTents || "TBD"}</div>
                 </div>
             </div>
         </div>

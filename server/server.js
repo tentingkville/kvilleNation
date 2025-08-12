@@ -5,6 +5,8 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 require('dotenv').config();
 const UserRoute = require('./routes/userRoutes');
+const { getAirtableConfig } = require('./lib/airtableConfig');
+
 const http = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
@@ -201,7 +203,6 @@ app.post('/api/end-check', (req, res) => {
 // Route to update tent status (Miss or Make)
 app.post('/api/tent-checks/update', async (req, res) => {
   const { id, misses, lastCheck, dateOfLastCheck, lastMissLM, dateOfLastMiss } = req.body;
-
   const fieldsToUpdate = {};
   if (misses !== undefined) fieldsToUpdate['Number of Misses'] = misses;
   if (lastCheck) fieldsToUpdate['Last Check'] = lastCheck;
@@ -210,17 +211,18 @@ app.post('/api/tent-checks/update', async (req, res) => {
   if (dateOfLastMiss) fieldsToUpdate['Date of Last Miss'] = dateOfLastMiss;
 
   try {
-    // Update Airtable
+    const cfg = await getAirtableConfig();
+    if (!cfg.airtableApiKey || !cfg.airtableBaseId || !cfg.airtableTableId) {
+      return res.status(500).json({ error: 'Airtable config not set' });
+    }
+
     await axios.patch(
-      `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_ID}/${id}`,
+      `https://api.airtable.com/v0/${cfg.airtableBaseId}/${cfg.airtableTableId}/${id}`,
       { fields: fieldsToUpdate },
-      { headers: { Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}` } }
+      { headers: { Authorization: `Bearer ${cfg.airtableApiKey}` } }
     );
 
-    // Remove this tent from activeTents
     activeTents = activeTents.filter((tent) => tent.id !== id);
-
-    // Broadcast via Socket.IO
     io.emit('tentStatusUpdated', { id });
     return res.status(200).send('Tent data updated successfully');
   } catch (error) {
@@ -232,37 +234,30 @@ app.post('/api/tent-checks/update', async (req, res) => {
 // Route to get tent data
 app.get('/api/tent-checks', async (req, res) => {
   try {
+    const cfg = await getAirtableConfig();
+    if (!cfg.airtableApiKey || !cfg.airtableBaseId || !cfg.airtableTableId) {
+      return res.status(500).json({ error: 'Airtable config not set' });
+    }
+
     let allRecords = [];
-    let offset; // Will store the 'offset' returned by Airtable for pagination
-    
+    let offset;
     do {
-      // Build a config object to pass optional `offset` param if present
       const config = {
-        headers: {
-          Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
-        },
+        headers: { Authorization: `Bearer ${cfg.airtableApiKey}` },
         params: {},
       };
-      if (offset) {
-        config.params.offset = offset;
-      }
-      
-      // Fetch from Airtable
+      if (offset) config.params.offset = offset;
+
       const response = await axios.get(
-        `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_TABLE_ID}`,
+        `https://api.airtable.com/v0/${cfg.airtableBaseId}/${cfg.airtableTableId}`,
         config
       );
-      
+
       const { records = [], offset: newOffset } = response.data;
-      
-      // Combine this page of records with our running list
       allRecords = allRecords.concat(records);
-      
-      // If Airtable returns an offset, it means there are more records
       offset = newOffset;
     } while (offset);
-    
-    // Now `allRecords` contains all records from *all* pages
+
     const tents = allRecords.map((record) => ({
       id: record.id,
       order: record.fields['Order'] || 0,
@@ -277,10 +272,7 @@ app.get('/api/tent-checks', async (req, res) => {
       dateOfLastCheck: record.fields['Date of Last Check'] || null,
       lastMissLM: record.fields['Last Miss LM'] || null,
       dateOfLastMiss: record.fields['Date of Last Miss'] || null,
-    }));
-
-    // Sort by the 'Order' field (numeric sort if you want strictly numeric ordering)
-    tents.sort((a, b) => a.order - b.order);
+    })).sort((a, b) => a.order - b.order);
 
     return res.json(tents);
   } catch (error) {
@@ -288,7 +280,6 @@ app.get('/api/tent-checks', async (req, res) => {
     return res.status(500).send('Failed to fetch tent data');
   }
 });
-
 // Route to get check status
 app.get('/api/check-status', (req, res) => {
   try {
@@ -310,8 +301,7 @@ app.get('/', (req, res) => {
 // Mount user routes
 app.use('/api/profile', UserRoute);
 app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/events', require('./routes/eventRoutes'));
-
+app.use('/api/airtable-config', require('./routes/airtableConfigRoutes'));
 /**
  * START THE SERVER IF LOCAL
  */

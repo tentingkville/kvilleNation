@@ -92,7 +92,7 @@ function Profile() {
             if (success) {
                 setSuccessMessage('Profile updated successfully!');
                 setErrorMessage('');
-                setFormData({ email: '', password: '', confirmPassword: '' }); // Reset form
+                setFormData({ email: '', password: '', confirmPassword: '' }); 
             }
         } catch (error) {
             console.error('Error during profile update:', error);
