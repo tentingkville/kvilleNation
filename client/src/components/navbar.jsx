@@ -44,152 +44,147 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="nav">
-      {/* Logo / App Name */}
-      <NavLink
-        to="/"
-        className="app-name"
-        onClick={closeMenu}
-        aria-label="K-Ville Nation home"
-      >
-        <FaBasketballBall className="app-icon" />
-        K-Ville Nation
-      </NavLink>
-
-      {/* LEFT SECTION (nav menu + mobile toggle) */}
-      <div className="nav-section left">
-        {/* Hamburger icon (mobile only) */}
-        <button
-          className="nav-toggle"
-          onClick={() => setIsNavExpanded(!isNavExpanded)}
-          aria-label="Toggle Menu"
+    <nav className='nav-shell'>
+      <div className="nav-bubble">
+        {/* Logo / App Name */}
+        <NavLink
+          to="/"
+          className="app-name"
+          onClick={closeMenu}
+          aria-label="K-Ville Nation home"
         >
-          {isNavExpanded ? <IoIosCloseCircleOutline /> : <IoIosArrowDropdown />}
-        </button>
+          <FaBasketballBall className="app-icon" />
+          K-Ville Nation
+        </NavLink>
 
-        {/* Main nav menu (horizontal on desktop, dropdown on mobile) */}
-        <div className={`nav-menu ${isNavExpanded ? 'show' : ''}`}>
-          <NavLink
-            to="/history"
-            className="nav-link"
-            activeClassName="active"
-            onClick={closeMenu}
+        {/* LEFT SECTION (nav menu + mobile toggle) */}
+        <div className="nav-section left">
+          {/* Hamburger icon (mobile only) */}
+          <button
+            className="nav-toggle"
+            onClick={() => setIsNavExpanded(!isNavExpanded)}
+            aria-label="Toggle Menu"
           >
-            History
-          </NavLink>
-          <NavLink
-            to="/policy"
-            className="nav-link"
-            activeClassName="active"
-            onClick={closeMenu}
-          >
-            Policy
-          </NavLink>
-          <NavLink
-            to="/calendar"
-            className="nav-link"
-            activeClassName="active"
-            onClick={closeMenu}
-          >
-            Calendar
-          </NavLink>
-          <NavLink
-            to="/line-monitors"
-            className="nav-link"
-            activeClassName="active"
-            onClick={closeMenu}
-          >
-            Line Monitors
-          </NavLink>
-          {user.isLineMonitor && (
+            {isNavExpanded ? <IoIosCloseCircleOutline /> : <IoIosArrowDropdown />}
+          </button>
+
+          <div className={`nav-menu ${isNavExpanded ? 'show' : ''}`}>
             <NavLink
-              to="/tent-check"
+              to="/history"
               className="nav-link"
               activeClassName="active"
               onClick={closeMenu}
             >
-              Tent Check
+              History
             </NavLink>
-          )}
-          {user.isSuperUser && (
             <NavLink
-              to="/line-monitor-dashboard"
+              to="/policy"
               className="nav-link"
               activeClassName="active"
               onClick={closeMenu}
             >
-              LM Dashboard
+              Policy
             </NavLink>
-          )}
-
-          {/* MOBILE-ONLY AUTH LINKS */}
-          <div className="mobile-auth-links">
-            {user.isAuthenticated ? (
-              <>
-                <NavLink
-                  to="/profile"
-                  className="nav-link"
-                  activeClassName="active"
-                  onClick={closeMenu}
-                >
-                  Hello, {user.firstName || 'User'}
-                </NavLink>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    closeMenu();
-                  }}
-                  className="nav-link logout-button"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
+            <NavLink
+              to="/calendar"
+              className="nav-link"
+              activeClassName="active"
+              onClick={closeMenu}
+            >
+              Calendar
+            </NavLink>
+            {user.isLineMonitor && (
               <NavLink
-                to="/login"
+                to="/tent-check"
                 className="nav-link"
                 activeClassName="active"
                 onClick={closeMenu}
               >
-                Sign In
+                Tent Check
               </NavLink>
             )}
+            {user.isSuperUser && (
+              <NavLink
+                to="/line-monitor-dashboard"
+                className="nav-link"
+                activeClassName="active"
+                onClick={closeMenu}
+              >
+                LM Dashboard
+              </NavLink>
+            )}
+
+            {/* MOBILE-ONLY AUTH LINKS */}
+            <div className="mobile-auth-links">
+              {user.isAuthenticated ? (
+                <>
+                  <NavLink
+                    to="/profile"
+                    className="nav-link"
+                    activeClassName="active"
+                    onClick={closeMenu}
+                  >
+                    Hello, {user.firstName || 'User'}
+                  </NavLink>
+                  <NavLink
+                    to="/#"
+                    onClick={() => {
+                      handleLogout();
+                      closeMenu();
+                    }}
+                    className="nav-link logout-button"
+                  >
+                    Logout
+                  </NavLink>
+                </>
+              ) : (
+                <NavLink
+                  to="/login"
+                  className="nav-link"
+                  activeClassName="active"
+                  onClick={closeMenu}
+                >
+                  Sign In
+                </NavLink>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* RIGHT SECTION (desktop-only) */}
-      <div className="nav-section right">
-      {user.isAuthenticated ? (
-              <>
+        {/* RIGHT SECTION (desktop-only) */}
+        <div className="nav-section right">
+        {user.isAuthenticated ? (
+                <>
+                  <NavLink
+                    to="/profile"
+                    className="nav-link"
+                    activeClassName="active"
+                    onClick={closeMenu}
+                  >
+                    Hello, {user.firstName || 'User'}
+                  </NavLink>
+                  <NavLink
+                    to="/#"
+                    onClick={() => {
+                      handleLogout();
+                      closeMenu();
+                    }}
+                    className="nav-link logout-button no-active"
+                  >
+                    Logout
+                  </NavLink>
+                </>
+              ) : (
                 <NavLink
-                  to="/profile"
+                  to="/login"
                   className="nav-link"
                   activeClassName="active"
                   onClick={closeMenu}
                 >
-                  Hello, {user.firstName || 'User'}
+                  Sign In
                 </NavLink>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    closeMenu();
-                  }}
-                  className="nav-link logout-button"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <NavLink
-                to="/login"
-                className="nav-link"
-                activeClassName="active"
-                onClick={closeMenu}
-              >
-                Sign In
-              </NavLink>
-            )}
+              )}
+        </div>
       </div>
     </nav>
   );

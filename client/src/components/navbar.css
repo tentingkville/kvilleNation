@@ -1,115 +1,80 @@
-/* Base reset stays the same */
+/* Reset */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* NAV WRAPPER */
-.nav {
+/* Sticky transparent shell that holds the pill */
+.nav-shell {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 10px 12px;              /* space around the pill */
+  background: transparent;
+}
+/* The pill/bubble itself */
+.nav-bubble {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #002b7f;
-  color: #fff;
-  padding: 1.5rem;                  /* slightly tighter */
-  position: sticky;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0,0,0,.18); /* subtle depth */
+
+  /* size & centering */
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 10px 14px;
+
+  border-radius: 9999px;
+  background: rgba(0, 43, 127, 0.88);            /* Duke navy, translucent */
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  backdrop-filter: blur(8px);                     /* glassy */
+  -webkit-backdrop-filter: blur(8px);
 }
 
-/* BRAND (icon + name) — distinct from nav links */
+/* Brand (icon + text) */
 .app-name {
   display: inline-flex;
   align-items: center;
   gap: .6rem;
   text-decoration: none;
   color: #fff;
-  font-weight: 800;                       /* bolder than links */
-  font-size: 1.45rem;                     /* larger than links */
-  letter-spacing: .01em;                  /* tiny tracking */
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: .01em;
   line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
 }
+.app-name:focus-visible { outline: 2px solid rgba(249,160,27,.7); outline-offset: 2px; }
+.app-name::after { content: none; }
 
-/* Make the brand feel “logo-like” without being noisy */
-.app-name:focus-visible {
-  outline: 2px solid rgba(249,160,27,.7); /* gold focus ring */
-  outline-offset: 2px;
-}
-.app-name::after { content: none; }       /* no underline */
-.app-name:hover { background: none; }     /* remove hover bg */
-
-/* Brand icon */
 .app-icon {
-  font-size: 1.55em;                      /* slightly bigger than text */
-  color: #f9a01b;
+  font-size: 1.4em;
+  color: #f9a01b; /* Copper accent */
   line-height: 1;
-  vertical-align: middle;                 /* better optical alignment */
 }
-.app-icon:hover { color: #f9a01b; }       /* no hover color change */
 
-/* NAV LINKS */
+/* Sections */
 .nav-section.left { display: flex; align-items: center; }
 .nav-section.right { display: flex; align-items: center; margin-left: auto; }
 
-/* Use gap for consistent spacing instead of per-link margins */
+/* Menu row */
 .nav-section.left .nav-menu {
   display: flex;
-  margin-left: 1rem;
-  gap: .25rem;                             /* tidy, compact spacing */
+  gap: .25rem;
+  margin-left: .5rem;
 }
 
-/* Links look lighter than brand */
+/* Links */
 .nav-link {
   color: #fff;
   text-decoration: none;
-  padding: .5em .75em;                     /* tighter, more clickable */
-  margin: 0;                               /* rely on gap above */
+  padding: .5em .75em;
+  border-radius: .6rem;
   position: relative;
-  border-radius: .5rem;                     /* soft hover bg corners */
   transition: background-color .2s ease;
 }
 
-/* Hover bg + underline; underline animates in */
-.nav-link:hover {
-  background-color: rgba(255,255,255,.08);
-}
 .nav-link::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  right: 50%;
-  bottom: 6px;                             /* lift underline a bit */
-  height: 3px;                             /* slightly thicker */
-  background: #f9a01b;
-  border-radius: 3px;
-  transition: left .22s ease, right .22s ease;
-}
-.nav-link.active:not(.app-name)::after,
-.nav-link:hover::after {
-  left: .75em;
-  right: .75em;
-}
-
-/* Keyboard focus on links/buttons */
-.nav-link:focus-visible,
-.logout-button:focus-visible {
-  outline: 2px solid rgba(255,255,255,.6);
-  outline-offset: 2px;
-}
-
-/* Logout button styled like link */
-.logout-button {
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  padding: .5em .75em;
-  margin: 0;
-  position: relative;
-  border-radius: .5rem;
-}
-.logout-button:hover { background-color: rgba(255,255,255,.08); }
-.logout-button::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -120,9 +85,34 @@
   border-radius: 3px;
   transition: left .22s ease, right .22s ease;
 }
+.nav-link.active:not(.app-name)::after,
+.nav-link:hover::after { left: .75em; right: .75em; }
+
+/* Logout styled like link */
+.logout-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  padding: .5em .75em;
+  border-radius: .6rem;
+  position: relative;
+  transition: background-color .2s ease;
+}
+.logout-button::after {
+  content: '';
+  position: absolute;
+  left: 50%; right: 50%; bottom: 6px;
+  height: 3px; background: #f9a01b; border-radius: 3px;
+  transition: left .22s ease, right .22s ease;
+}
 .logout-button:hover::after { left: .75em; right: .75em; }
 
-/* MOBILE */
+.logout-button::hover{
+  background-color: transparent !important;
+}
+
+/* Hamburger */
 .nav-toggle {
   display: none;
   background: none;
@@ -130,48 +120,51 @@
   color: #fff;
   font-size: 1.6rem;
   cursor: pointer;
-  margin-left: 10px;
+  margin-left: 8px;
 }
-
+.nav-toggle:hover{
+  background: transparent !important;
+}
 .mobile-auth-links { display: none; }
+.nav-link.no-active.active::after { left: 50%; right: 50%; }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+  .nav-bubble { padding: 10px 12px; }
+
   .nav-toggle { display: block; }
   .nav-section.right { display: none; }
 
   .nav-section.left .nav-menu {
     display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
+    top: calc(100% + 8px);         /* below the pill */
+    left: 12px; right: 12px;
     flex-direction: column;
-    width: 100%;
-    background-color: #002b7f;
-    padding: .75rem 0;
-    gap: 0;                                 /* stacked list */
-    box-shadow: 0 8px 18px rgba(0,0,0,.2);
+    background: rgba(0, 43, 127, 0.95);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 14px 30px rgba(0,0,0,.25);
+    overflow: hidden;
+    backdrop-filter: blur(8px);
   }
-  .nav-section.left .nav-menu.show { display: flex; }
+  .nav-section.left .nav-menu.show{ display: flex; }
 
   .mobile-auth-links {
     display: flex;
     flex-direction: column;
   }
 
-  .nav-section.left .nav-menu.show .nav-link,
-  .nav-section.left .nav-menu.show .logout-button {
+  .nav-section.left .nav-menu .nav-link,
+  .nav-section.left .nav-menu .logout-button {
     width: 100%;
-    padding: .9em 1.25em;
-    text-align: left;
-    border-radius: 0;                        /* list feel */
+    padding: .95em 1.1em;
+    border-radius: 0;
   }
+  .nav-section.left .nav-menu .nav-link::after,
+  .nav-section.left .nav-menu .logout-button::after { display: none; }
 
-  /* Remove underline in the mobile drawer; rely on hover bg */
-  .nav-section.left .nav-menu.show .nav-link::after,
-  .nav-section.left .nav-menu.show .logout-button::after { display: none; }
-
-  .nav-section.left .nav-menu.show .nav-link:hover,
-  .nav-section.left .nav-menu.show .logout-button:hover {
-    background-color: rgba(255,255,255,0.1);
+  .nav-section.left .nav-menu .nav-link:hover,
+  .nav-section.left .nav-menu .logout-button:hover {
+    background-color: rgba(255,255,255,.08);
   }
 }

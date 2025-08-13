@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
+import '../styles/calendar.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -23,12 +24,13 @@ export default function Calendar() {
   }, []);
 
   return (
-    <div className="calendar-page">
+  <div className="calendar-page">
+    <div className="calendar">
       {loading ? (
         <p>Loading…</p>
       ) : url ? (
-        <div style={{ height: '80vh' }}>
-          <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
+        <div className="pdf-frame">
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
             <Viewer fileUrl={url} />
           </Worker>
         </div>
@@ -36,5 +38,6 @@ export default function Calendar() {
         <p>No calendar file uploaded yet.</p>
       )}
     </div>
-  );
+  </div>
+);
 }

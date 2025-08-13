@@ -59,7 +59,7 @@
 .tent-row {
     display: flex;
     border-bottom: 1px solid #e0e0e0;
-    min-width: 1200px; /* Adjust this based on your total min-width of cells */}
+    min-width: 1100px; /* Adjust this based on your total min-width of cells */}
 
 
 .tent-cell {

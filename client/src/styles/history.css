@@ -1,9 +1,18 @@
+.history{
+    max-width: 1100px;
+    margin: auto;
+}
 .history .box {
-    margin: 20px;
-    padding: 15px;
     border: 1px solid #ddd;
     border-radius: 15px;
     background-color: #f9f9f9;
+    padding-top: 15px;
+    /* max-width: 1100px;
+    margin: 0 auto; */
+}
+
+.box{
+    margin-top: 10px;
 }
 
 .history .title {
@@ -25,11 +34,12 @@
     color: #666;
     text-align: justify;
     line-height: 1.8; /* Increased line height for better readability */
+    margin: auto;
 }
 
 .history blockquote {
     padding: 10px;
-    margin: 10px 0;
+    margin: 10px 15px;
     border-left: 3px solid #ccc;
     background-color: #f0f0f0;
     font-style: italic;

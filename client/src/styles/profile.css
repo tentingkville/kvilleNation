@@ -1,6 +1,6 @@
 .profile-container {
-    max-width: 600px;
-    margin: 50px auto;
+    max-width: 1100px;
+    margin: 25px auto;
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
@@ -11,7 +11,7 @@
 
 h1 {
     font-size: 2.5em;
-    color: #5c6bc0;
+    color: #012169;
     margin-bottom: 10px;
 }
 
@@ -47,14 +47,14 @@ input {
 
 input:focus {
     outline: none;
-    border-color: #5c6bc0;
+    border-color: #007bff;
     box-shadow: 0 0 5px rgba(92, 107, 192, 0.5);
 }
 
 .profile-update-btn {
     font-size: 1em;
     padding: 10px 20px;
-    background-color: #5c6bc0;
+    background-color: #012169;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -63,7 +63,7 @@ input:focus {
 }
 
 .profile-update-btn:hover {
-    background-color: #3949ab;
+    background-color: #0147ff;
 }
 
 .success-message {
@@ -76,4 +76,93 @@ input:focus {
     color: #f44336;
     font-size: 1em;
     margin-top: 15px;
+}
+/* --- Tent Card --- */
+.tent-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 24px 0;
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  background: linear-gradient(to bottom right, #ffffff, #dae3f2);
+  text-align: left;
+}
+
+.tent-card-header { display: flex; flex-direction: column; gap: 6px; }
+.tent-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.tent-name {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #012169;
+  font-weight: 800;
+}
+
+.tent-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: .85rem;
+  border: 1px solid #e7e7e7;
+  background: #f8f9fa;
+  color: #1b1e21;
+}
+.pill-type { background: #e8f1ff; border-color: #cfe2ff; color: #0b57d0; text-transform: uppercase; }
+.pill-order { background: #fff7e6; border-color: #ffe1b3; color: #a76700; }
+.pill-safe { background: #e9f8ee; border-color: #bee6cc; color: #117a36; }
+.pill-danger { background: #ffecee; border-color: #ffd0d6; color: #b42318; }
+
+.tent-caption { color: #4a5568; font-size: .95rem; }
+
+.tent-loading, .tent-empty { padding: 12px 4px; color: #666; }
+
+.tent-body { margin-top: 10px; display: grid; gap: 16px; }
+
+/* Stats grid */
+.tent-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.profile-form-card {
+  background: linear-gradient(to bottom right, #ffffff, #dae3f2);;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 24px 0;
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  text-align: left;
+}
+@media (max-width: 560px) {
+  .tent-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.stat {
+  background: #f7f9ff;
+  border: 1px solid #e7eeff;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.stat-label { font-size: .8rem; color: #6b7280; }
+.stat-value { font-size: 1.05rem; font-weight: 700; color: #1b1e21; }
+
+/* Members list */
+.members-wrap { }
+.members-title { font-weight: 700; color: #012169; margin-bottom: 6px; }
+.members-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+.member-chip {
+  background: #f1f3f5;
+  color: #111827;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: .9rem;
+  border: 1px solid #e5e7eb;
 }

@@ -212,5 +212,30 @@ router.post('/update-password', authenticateToken, async (req, res) => {
     }
 });
 
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    
+    if (!req.user?.netID) {
+      return res.status(400).json({ error: 'Token missing netID' });
+    }
+
+    const me = await kvilleProfiles.findOne({ netID: req.user.netID.toLowerCase() }).lean();
+    if (!me) return res.status(404).json({ error: 'User not found' });
+
+    return res.json({
+      firstName: me.firstName,
+      lastName: me.lastName,
+      email: me.email,
+      netID: me.netID,
+      isLineMonitor: me.isLineMonitor,
+      isSuperUser: me.isSuperUser,
+    });
+  } catch (e) {
+    console.error('/api/profile/me error', e);
+    return res.status(500).json({ error: 'Failed to load profile' });
+  }
+});
+
+
 
 module.exports = router;

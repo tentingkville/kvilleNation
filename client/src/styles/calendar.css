@@ -1,73 +1,40 @@
+.calendar-page {
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+}
+
 .calendar {
-    font-family: Arial, sans-serif;
-    background-color: #fff;
-    margin: 20px 100px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    border-radius: 10px; /* Rounded corners for box bubble */
-    overflow: hidden; /* Ensures the shadow and border apply neatly */
-  }
-  
-  .calendar-header {
-    background-color: #002b7f;
-    color: white;
-    display: flex;
-    justify-content: space-between; /* Align navigation buttons to the sides */
-    align-items: center;
-    padding: 0 10px;
-  }
-  
-  .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-auto-rows: 100px;
-  }
-  
-  .header-cell {
-    background-color: #002b7f;
-    color: white;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .day-cell {
-    border-bottom: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    padding: 10px;
-    text-align: right;
-    background-color: #e3f2fd;
-  }
-  
-  .day-cell.empty {
-    background-color: transparent;
-  }
-  
-  .day-cell.today {
-    border: 2px solid #002b7f;
-  }
-  
-  .event-dot {
-    height: 5px;
-    width: 5px;
-    background-color: #f44336;
-    border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-  }
-  
-  .day-cell:last-child {
-    border-right: none;
-  }
-  
-  button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5em;
-    cursor: pointer;
-  }
-  
-  button:focus {
-    outline: none;
-  }
-  
+  width: 100%;
+  max-width: 1100px;         
+  margin: 0 auto;
+}
+
+/* The viewer needs a fixed height somewhere upstream */
+.pdf-frame {
+  height: 80vh;                /* visible height; adjust if you like */
+  min-height: 520px;           /* fallback on small screens */
+  border-radius: 12px;
+  overflow: hidden;
+  /* optional: subtle card styling */
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+}
+
+/* Make the internal viewer fill that height */
+.pdf-frame .rpv-core__viewer,
+.pdf-frame .rpv-core__inner-pages {
+  height: 100% !important;
+}
+
+/* If you have a global `canvas { max-width:100% }`, it can distort pages.
+   Reset canvas sizing just inside the calendar. */
+.calendar canvas {
+  max-width: none !important;
+  width: auto !important;
+}
+
+/* Optional: remove the heavy page drop-shadows if you want a flat look */
+.pdf-frame .rpv-core__page-layer {
+  box-shadow: none !important;
+}

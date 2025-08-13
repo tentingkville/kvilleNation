@@ -7,7 +7,6 @@ import Home from './pages/home.jsx';
 import History from './pages/history.jsx';
 import Policy from './pages/policy.jsx';
 import Calendar from './pages/calendar.jsx';
-import LineMonitors from './pages/lineMonitors.jsx';
 import Profile from './pages/profile.jsx';
 import Login from './pages/login.jsx';
 import TentCheck from './pages/tentCheck.jsx';
@@ -36,7 +35,6 @@ function App() {
         <Route path="/history" element={<History />} />
         <Route path="/policy" element={<Policy />} />
         <Route path="/calendar" element={<Calendar />} />
-        <Route path="/line-monitors" element={<LineMonitors />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/profile"
