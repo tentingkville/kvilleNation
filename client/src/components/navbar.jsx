@@ -3,6 +3,7 @@ import './navbar.css';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { IoIosArrowDropdown, IoIosCloseCircleOutline } from 'react-icons/io';
 import { useUser } from '../userContext';
+import { FaBasketballBall } from "react-icons/fa";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
@@ -45,8 +46,14 @@ export default function Navbar() {
   return (
     <nav className="nav">
       {/* Logo / App Name */}
-      <NavLink to="/" className="nav-link app-name" onClick={closeMenu}>
-        KVILLENATION
+      <NavLink
+        to="/"
+        className="app-name"
+        onClick={closeMenu}
+        aria-label="K-Ville Nation home"
+      >
+        <FaBasketballBall className="app-icon" />
+        K-Ville Nation
       </NavLink>
 
       {/* LEFT SECTION (nav menu + mobile toggle) */}

@@ -1,128 +1,143 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Base reset stays the same */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* NAV WRAPPER */
 .nav {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background-color: #002b7f;
-  color: white;
-  padding: 1em;
+  color: #fff;
+  padding: 1.5rem;                  /* slightly tighter */
   position: sticky;
   top: 0;
   width: 100%;
   z-index: 1000;
-  justify-content: space-between;
+  box-shadow: 0 2px 10px rgba(0,0,0,.18); /* subtle depth */
 }
 
-.nav-link.app-name {
-  font-weight: bold;
-  font-size: 1.5em;
-  margin-right: 20px;
+/* BRAND (icon + name) — distinct from nav links */
+.app-name {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
   text-decoration: none;
-  color: white;
+  color: #fff;
+  font-weight: 800;                       /* bolder than links */
+  font-size: 1.45rem;                     /* larger than links */
+  letter-spacing: .01em;                  /* tiny tracking */
+  line-height: 1;
 }
 
+/* Make the brand feel “logo-like” without being noisy */
+.app-name:focus-visible {
+  outline: 2px solid rgba(249,160,27,.7); /* gold focus ring */
+  outline-offset: 2px;
+}
+.app-name::after { content: none; }       /* no underline */
+.app-name:hover { background: none; }     /* remove hover bg */
+
+/* Brand icon */
+.app-icon {
+  font-size: 1.55em;                      /* slightly bigger than text */
+  color: #f9a01b;
+  line-height: 1;
+  vertical-align: middle;                 /* better optical alignment */
+}
+.app-icon:hover { color: #f9a01b; }       /* no hover color change */
+
+/* NAV LINKS */
+.nav-section.left { display: flex; align-items: center; }
+.nav-section.right { display: flex; align-items: center; margin-left: auto; }
+
+/* Use gap for consistent spacing instead of per-link margins */
+.nav-section.left .nav-menu {
+  display: flex;
+  margin-left: 1rem;
+  gap: .25rem;                             /* tidy, compact spacing */
+}
+
+/* Links look lighter than brand */
 .nav-link {
-  color: white;
+  color: #fff;
   text-decoration: none;
-  padding: 0.5em;
-  margin: 0 0.5em;
+  padding: .5em .75em;                     /* tighter, more clickable */
+  margin: 0;                               /* rely on gap above */
   position: relative;
-  transition: background 0.3s ease;
+  border-radius: .5rem;                     /* soft hover bg corners */
+  transition: background-color .2s ease;
 }
-.nav-link:link,
-.nav-link:visited,
-.nav-link:hover,
-.nav-link:active {
-  color: white;
+
+/* Hover bg + underline; underline animates in */
+.nav-link:hover {
+  background-color: rgba(255,255,255,.08);
 }
 .nav-link::after {
   content: '';
   position: absolute;
   left: 50%;
   right: 50%;
-  bottom: 0;
+  bottom: 6px;                             /* lift underline a bit */
+  height: 3px;                             /* slightly thicker */
   background: #f9a01b;
-  height: 2px;
-  transition: left 0.3s ease, right 0.3s ease;
+  border-radius: 3px;
+  transition: left .22s ease, right .22s ease;
 }
-
-.nav-link.active:not(.app-name)::after {
-  left: 0;
-  right: 0;
-}
-
+.nav-link.active:not(.app-name)::after,
 .nav-link:hover::after {
-  left: 0;
-  right: 0;
+  left: .75em;
+  right: .75em;
 }
 
+/* Keyboard focus on links/buttons */
+.nav-link:focus-visible,
+.logout-button:focus-visible {
+  outline: 2px solid rgba(255,255,255,.6);
+  outline-offset: 2px;
+}
+
+/* Logout button styled like link */
 .logout-button {
   background: none;
   border: none;
   color: inherit;
   cursor: pointer;
-  font-size: inherit;
-  margin: 0 0.5em;
-  padding: 0.5em;
+  font: inherit;
+  padding: .5em .75em;
+  margin: 0;
   position: relative;
+  border-radius: .5rem;
 }
-
+.logout-button:hover { background-color: rgba(255,255,255,.08); }
 .logout-button::after {
   content: '';
   position: absolute;
   left: 50%;
   right: 50%;
-  bottom: 0;
+  bottom: 6px;
+  height: 3px;
   background: #f9a01b;
-  height: 2px;
-  transition: left 0.3s ease, right 0.3s ease;
+  border-radius: 3px;
+  transition: left .22s ease, right .22s ease;
 }
+.logout-button:hover::after { left: .75em; right: .75em; }
 
-.logout-button:hover::after {
-  left: 0;
-  right: 0;
-}
-
-
-.nav-section.left {
-  display: flex;
-  align-items: center;
-}
-.nav-section.right {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-
+/* MOBILE */
 .nav-toggle {
   display: none;
   background: none;
   border: none;
-  color: white;
-  font-size: 1.75em;
+  color: #fff;
+  font-size: 1.6rem;
   cursor: pointer;
   margin-left: 10px;
 }
-.mobile-auth-links {
-  display: none;
-}
-.nav-section.left .nav-menu {
-  display: flex;
-  margin-left: 1em;
-}
+
+.mobile-auth-links { display: none; }
 
 @media (max-width: 768px) {
-  .nav-toggle {
-    display: block;
-  }
-
-  .nav-section.right {
-    display: none;
-  }
+  .nav-toggle { display: block; }
+  .nav-section.right { display: none; }
 
   .nav-section.left .nav-menu {
     display: none;
@@ -132,12 +147,12 @@
     flex-direction: column;
     width: 100%;
     background-color: #002b7f;
-    padding: 1em 0;
+    padding: .75rem 0;
+    gap: 0;                                 /* stacked list */
+    box-shadow: 0 8px 18px rgba(0,0,0,.2);
   }
+  .nav-section.left .nav-menu.show { display: flex; }
 
-  .nav-section.left .nav-menu.show {
-    display: flex;
-  }
   .mobile-auth-links {
     display: flex;
     flex-direction: column;
@@ -146,18 +161,17 @@
   .nav-section.left .nav-menu.show .nav-link,
   .nav-section.left .nav-menu.show .logout-button {
     width: 100%;
-    padding: 1em 1.5em;
+    padding: .9em 1.25em;
     text-align: left;
-    position: relative;
+    border-radius: 0;                        /* list feel */
   }
 
+  /* Remove underline in the mobile drawer; rely on hover bg */
   .nav-section.left .nav-menu.show .nav-link::after,
-  .nav-section.left .nav-menu.show .logout-button::after {
-    display: none;
-  }
+  .nav-section.left .nav-menu.show .logout-button::after { display: none; }
 
   .nav-section.left .nav-menu.show .nav-link:hover,
   .nav-section.left .nav-menu.show .logout-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255,255,255,0.1);
   }
 }
