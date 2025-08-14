@@ -34,12 +34,12 @@
     color: #666;
     text-align: justify;
     line-height: 1.8; /* Increased line height for better readability */
-    margin: auto;
+    margin: 0 15px; /* Added margin for spacing */
 }
 
 .history blockquote {
     padding: 10px;
-    margin: 10px 15px;
+    margin: 20px 0;
     border-left: 3px solid #ccc;
     background-color: #f0f0f0;
     font-style: italic;
