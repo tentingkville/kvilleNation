@@ -93,6 +93,22 @@ export default function Navbar() {
             >
               Calendar
             </NavLink>
+            <NavLink
+              to="/questions"
+              className="nav-link"
+              activeClassName="active"
+              onClick={closeMenu}
+            >
+              Questions
+            </NavLink>
+            <NavLink
+              to="/contacts"
+              className="nav-link"
+              activeClassName="active"
+              onClick={closeMenu}
+            >
+              Contacts
+            </NavLink>
             {user.isLineMonitor && (
               <NavLink
                 to="/tent-check"

@@ -7,6 +7,8 @@ import Home from './pages/home.jsx';
 import History from './pages/history.jsx';
 import Policy from './pages/policy.jsx';
 import Calendar from './pages/calendar.jsx';
+import Questions from './pages/questions.jsx';
+import Contacts from './pages/contacts.jsx';
 import Profile from './pages/profile.jsx';
 import Login from './pages/login.jsx';
 import TentCheck from './pages/tentCheck.jsx';
@@ -34,6 +36,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/history" element={<History />} />
         <Route path="/policy" element={<Policy />} />
+        <Route path="/questions" element={<Questions />} />
+        <Route path="/contacts" element={<Contacts />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/login" element={<Login />} />
         <Route
