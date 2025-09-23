@@ -15,7 +15,7 @@
 .questions .content {
     font-size: 18px;
     color: #666;
-    text-align: center;
+    text-align: left;
     line-height: 1.8; /* Increased line height for better readability */
     margin: auto;
 }
@@ -58,4 +58,20 @@
     line-height: 1.6;
     border-left: 3px solid #ccc;
     padding-left: 10px;
+}
+
+.questions .img-answer {
+    display: block;
+    margin: 0;
+    max-width: 50%;   /* responsive */
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.questions .img-answer-content {
+    display: flex;
+    flex-direction: column; /* stack vertically */
+    align-items: center;    /* center align */
+    gap: 8px;
 }
