@@ -92,14 +92,81 @@ function FAQs() {
           ),
         },
         {
+          q: "What are the different tenting tests and what do they mean?",
+          a: (
+            <div>
+              <p>
+              The Black Tenting Test (“Entry Test”) will occur if more than 80 tents register for Black tenting
+              within the first 48 hours of tent registration; test content will be based on the 2025-2026 Duke MBB
+              season only. Tents that score within the top 70 will receive a Black tenting spot, and tents scoring
+              71-80 will receive a Blue tenting spot in the order of their score.
+              </p>
+              <p>
+              The Ordering Test happens every year and is only for Black tenters. In contrast to the entry test, 
+              it tests <strong> all </strong> of Duke MBB history. Your tent’s score will factor into the eventual ordering of Black tents.
+              </p>
+            </div>
+          ),
+        },
+        {
+          q: "What does it mean to Dirty Black or Dirty Blue tent?",
+          a: (
+            <p> Afraaz working on it </p>
+          ),
+        },
+        {
+          q: "Can we change who is in our tent after we have registered our tent?",
+          a: (
+            <p> Afraaz working on it </p>
+          ),
+        },
+        {
+          q: "When do we get grace during tenting?",
+          a: (
+            <div>
+              <p>
+              As a reminder, there is <strong> no </strong> grace for WUL–the following conditions only apply
+              to those tenting for the UNC game. Grace will occur: 
+              </p>
+              <p>
+                <strong> After every tent check for one hour. </strong>
+              </p>
+              <p>
+                <strong> Two hours before and after a Men’s or Women’s home basketball game. </strong>
+              </p>
+              <p>
+                <strong> One hour before and after a Men’s or Women’s away basketball game. </strong>
+              </p>
+              <p>
+                <strong> Weather-related grace is given in the following circumstances: Temperatures below or equal to 32°F, 
+                greater than 2” of accumulated snow, sustained winds higher than 35 mph, lightning within a six-mile radius, 
+                severe weather warnings, icy conditions, school closure. </strong>
+              </p>
+              <p>
+                <strong> At any time, for any length at the discretion of the Head Line Monitors. </strong>
+              </p>
+              <p>
+                Note that grace will <strong> always </strong> be communicated by Line Monitors in the shared Slack channel, 
+                which will be sent to all tenters early in the spring semester.
+              </p>
+            </div>
+          ),
+        },
+        {
+          q: "Can I tent for UNC and wait in line for other games at the same time?",
+          a: (
+            <p> Afraaz working on it </p>
+          ),
+        },
+        {
           q: "I am worried about the financial and/or physical burden of tenting. Does Duke provide resources to help with this?",
           a: (
             <div>
               <p>
                 Yes! For financial concerns, the Tenting Loaner Program is available to provide tenters with free equipment such as sleeping bags,
                 lanterns, etc. Need-related assessments will be conducted by Student Involvement and Leadership and details on how to apply 
-                will be sent out in early December. For accessibility accommodations in Walk-Up Line in K-Ville, tenting, accessible seating in
-                Cameron, etc.—please reach out to the Head Line Monitors (headlinemonitors@gmail.com) or our representative in the SDAO office (leigh.bhe@duke.edu). 
+                will be sent out in early December. For accessibility accommodations needed for WUL, tenting, accessible seating in
+                Cameron, etc., please reach out to the Head Line Monitors (headlinemonitors@gmail.com) or our representative in the SDAO office (leigh.bhe@duke.edu). 
               </p>
               <p>
                 <strong>
@@ -112,10 +179,14 @@ function FAQs() {
         },
       ];
 
-      const [openIndex, setOpenIndex] = useState(null);
+      const [openIndexes, setOpenIndexes] = useState([]);
 
       const toggleAnswer = (index) => {
-        setOpenIndex(openIndex === index ? null : index);
+        if (openIndexes.includes(index)) {
+          setOpenIndexes(openIndexes.filter((i) => i !== index));
+        } else {
+          setOpenIndexes([...openIndexes, index]);
+        }
       };
     
       return (
@@ -128,20 +199,21 @@ function FAQs() {
             </Link>{" "}
             page to see who to reach out to.
           </p>
-    
           {faqs.map((item, index) => (
             <div
               key={index}
-              className={`box ${openIndex === index ? "open" : ""}`}
+              className={`box ${openIndexes.includes(index) ? "open" : ""}`}
             >
               <div
                 className="header"
                 onClick={() => toggleAnswer(index)}
               >
                 <span>{index + 1}. {item.q}</span>
-                <span className="arrow">{openIndex === index ? "▲" : "▼"}</span>
+                <span className="arrow">
+                  {openIndexes.includes(index) ? "▲" : "▼"}
+                </span>
               </div>
-              {openIndex === index && (
+              {openIndexes.includes(index) && (
                 <div className="answer">{item.a}</div>
               )}
             </div>
