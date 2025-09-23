@@ -94,12 +94,12 @@ export default function Navbar() {
               Calendar
             </NavLink>
             <NavLink
-              to="/questions"
+              to="/faqs"
               className="nav-link"
               activeClassName="active"
               onClick={closeMenu}
             >
-              Questions
+              FAQs
             </NavLink>
             <NavLink
               to="/contacts"

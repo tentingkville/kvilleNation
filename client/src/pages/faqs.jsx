@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
 import kvilleBoundaries from "../images/kvilleboundaries.png"
-import '../styles/questions.css';
+import '../styles/faqs.css';
 
-function Questions() {
+function FAQs() {
 
-    const questions = [
+    const faqs = [
         {
           q: "What are the K-Ville boundaries?",
           a: (
@@ -18,13 +18,10 @@ function Questions() {
               <p>
                 Krzyzewskiville is formally defined as the grassy lawn area in front of Card and
                 Wilson gyms, their surrounding sidewalks, and the plaza in front of Cameron and
-                the Schwartz-Butters Building.
-              </p>
-              <p>
-                Students who are on duty for their tent or walk-up line group should remain
-                within these boundaries at all times unless given specific permission from a Line
-                Monitor. Otherwise, if a check is called and you are not within the specified 
-                boundaries, it will constitute as a missed check.
+                the Schwartz-Butters Building. Students who are on duty for their tent or walk-up line
+                group should remain within these boundaries at all times unless given specific permission
+                from a Line Monitor. Otherwise, if a check is called and you are not within the specified 
+                boundaries while on shift, it will count as a missed check.
               </p>
             </div>
           ),
@@ -43,7 +40,7 @@ function Questions() {
                 be in K-Ville at all times. When you first check in for your group, you will be required to
                 show your Duke Card; there is no need to check out when your shift is over. Additionally, 
                 checks will be called by Line Monitors at random points throughout the day; there is 
-                <strong> no </strong> grace in between checks.
+                <strong> no </strong> grace period between checks.
               </p>
               <p>
                 For most games, WUL registration is open from 7am on game day until two hours before game time.
@@ -101,7 +98,7 @@ function Questions() {
               <p>
                 Yes! For financial concerns, the Tenting Loaner Program is available to provide tenters with free equipment such as sleeping bags,
                 lanterns, etc. Need-related assessments will be conducted by Student Involvement and Leadership and details on how to apply 
-                will be sent out in early Decemnber. For accessibility accomodations—waiting in Walk-Up Line in K-Ville, tenting, accessible seating in
+                will be sent out in early December. For accessibility accommodations in Walk-Up Line in K-Ville, tenting, accessible seating in
                 Cameron, etc.—please reach out to the Head Line Monitors (headlinemonitors@gmail.com) or our representative in the SDAO office (leigh.bhe@duke.edu). 
               </p>
               <p>
@@ -122,8 +119,8 @@ function Questions() {
       };
     
       return (
-        <div className="questions">
-          <p className="title">Commonly Asked Questions</p>
+        <div className="faqs">
+          <p className="title">Frequently Asked Questions</p>
           <p className="content">
             For any additional questions not answered here, please refer to our{" "}
             <Link to="/contacts" className="contacts-link">
@@ -132,7 +129,7 @@ function Questions() {
             page to see who to reach out to.
           </p>
     
-          {questions.map((item, index) => (
+          {faqs.map((item, index) => (
             <div
               key={index}
               className={`box ${openIndex === index ? "open" : ""}`}
@@ -153,4 +150,4 @@ function Questions() {
       );
     }
 
-export default Questions;
+export default FAQs;
