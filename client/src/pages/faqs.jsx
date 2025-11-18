@@ -171,7 +171,7 @@ function FAQs() {
               <p>
                 <strong>
                 Contact information can additionally be found on our{" "}
-                <Link to="/contacts">Contacts</Link> page.
+                <Link to="/contacts">Contact Information</Link> page.
                 </strong>
               </p>
             </div>
@@ -195,7 +195,7 @@ function FAQs() {
           <p className="content">
             For any additional questions not answered here, please refer to our{" "}
             <Link to="/contacts" className="contacts-link">
-              Contacts
+              Contact Information
             </Link>{" "}
             page to see who to reach out to.
           </p>

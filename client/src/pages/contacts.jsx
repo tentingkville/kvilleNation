@@ -4,14 +4,14 @@ import "../styles/contacts.css";
 function Contacts() {
   const contacts = [
     { role: "Head Line Monitors", info: "General inquiries", email: "headlinemonitor@gmail.com" },
-    { role: "VPs of Tenting", info: "Tenting-related inquiries, i.e. missed checks", email: "tenting.kville@gmail.com" },
+    { role: "VPs of Tenting", info: "Tenting-related inquiries, i.e. roster changes", email: "tenting.kville@gmail.com" },
     { role: "VPs of Gameday", info: "Gameday-related inquiries, i.e. WUL information", email: "operationsgameday@gmail.com" },
-    { role: "Student Disability & Accommodations Office (SDAO)", info: "Accommodations needed for games, tenting, financial aid, etc.", email: "leigh.bhe@duke.edu" },
+    { role: "Student Disability & Accommodations Office (SDAO)", info: "Accommodations needed for games, tenting, financial aid, etc.", email: "leigh.millar@duke.edu" },
   ];
 
   return (
     <div className="contacts">
-      <p className="title">Contacts</p>
+      <p className="title">Contact Information</p>
       {contacts.map((c, index) => (
         <div key={index} className="card">
             <p className="role">{c.role}</p>
