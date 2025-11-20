@@ -182,11 +182,15 @@ input:focus {
 
 @media (max-width: 600px) {
   .profile-container .members-list {
-    gap: 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 10px;
   }
 
   .profile-container .member-chip {
-    font-size: 0.9rem;
-    padding: 6px 10px;
+    width: 100%;
+    text-align: center;
+    padding: 8px 10px;
+    white-space: normal;
   }
 }
