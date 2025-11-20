@@ -4,6 +4,8 @@ const UserContext = createContext();
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+console.log(API_BASE_URL, "base")
+
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState({
     isAuthenticated: false,
