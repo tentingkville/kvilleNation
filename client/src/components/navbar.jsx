@@ -72,7 +72,7 @@ export default function Navbar() {
             <NavLink
               to="/history"
               className="nav-link"
-              activeClassName="active"
+              activeclassname="active"
               onClick={closeMenu}
             >
               History
@@ -80,7 +80,7 @@ export default function Navbar() {
             <NavLink
               to="/policy"
               className="nav-link"
-              activeClassName="active"
+              activeclassname="active"
               onClick={closeMenu}
             >
               Policy
@@ -88,7 +88,7 @@ export default function Navbar() {
             <NavLink
               to="/calendar"
               className="nav-link"
-              activeClassName="active"
+              activeclassname="active"
               onClick={closeMenu}
             >
               Calendar
@@ -97,7 +97,7 @@ export default function Navbar() {
               <NavLink
                 to="/tent-check"
                 className="nav-link"
-                activeClassName="active"
+                activeclassname="active"
                 onClick={closeMenu}
               >
                 Tent Check
@@ -107,7 +107,7 @@ export default function Navbar() {
               <NavLink
                 to="/line-monitor-dashboard"
                 className="nav-link"
-                activeClassName="active"
+                activeclassname="active"
                 onClick={closeMenu}
               >
                 LM Dashboard
@@ -121,7 +121,7 @@ export default function Navbar() {
                   <NavLink
                     to="/profile"
                     className="nav-link"
-                    activeClassName="active"
+                    activeclassname="active"
                     onClick={closeMenu}
                   >
                     Hello, {user.firstName || 'User'}
@@ -141,7 +141,7 @@ export default function Navbar() {
                 <NavLink
                   to="/login"
                   className="nav-link"
-                  activeClassName="active"
+                  activeclassname="active"
                   onClick={closeMenu}
                 >
                   Sign In
@@ -158,7 +158,7 @@ export default function Navbar() {
                   <NavLink
                     to="/profile"
                     className="nav-link"
-                    activeClassName="active"
+                    activeclassname="active"
                     onClick={closeMenu}
                   >
                     Hello, {user.firstName || 'User'}
@@ -178,7 +178,7 @@ export default function Navbar() {
                 <NavLink
                   to="/login"
                   className="nav-link"
-                  activeClassName="active"
+                  activeclassname="active"
                   onClick={closeMenu}
                 >
                   Sign In

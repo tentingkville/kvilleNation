@@ -306,6 +306,7 @@ app.use('/api/airtable-config', require('./routes/airtableConfigRoutes'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // serve files
 app.use('/api/files', require('./routes/fileRoutes'));       
 app.use('/api/tent-link', require('./routes/tentLinkRoutes'));
+app.use('/api/season-status', require('./routes/seasonStatus'));
 
 /**
  * START THE SERVER IF LOCAL

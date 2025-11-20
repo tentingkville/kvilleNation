@@ -341,3 +341,104 @@ table tbody tr:hover {
 .lm-dashboard .stats-row {
       grid-template-columns: repeat(3, 1fr);
 }
+/* === Season Settings Card === */
+.season-settings-card {
+  margin-top: 30px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+/* Header */
+.season-settings-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #222;
+  text-align: center;
+}
+
+.season-settings-header p {
+  margin: 4px 0 16px 0;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+/* Status Row */
+.season-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* Status label left side */
+.season-status-indicator {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.season-status-indicator.on {
+  color: #28a745;
+}
+
+.season-status-indicator.off {
+  color: #dc3545;
+}
+
+/* Toggle group */
+.season-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.season-toggle-text {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.season-toggle-text.on {
+  color: #28a745;
+}
+.season-toggle-text.off {
+  color: #dc3545;
+}
+
+/* Right button */
+.season-toggle-button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.season-toggle-button:hover:not(:disabled) {
+  background: #005ecb;
+}
+
+.season-toggle-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .season-status-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .season-toggle-button {
+    width: 100%;
+  }
+}
