@@ -140,6 +140,10 @@
 }
 .duke-card-checker .excluded {
   pointer-events: auto;
+  color: gray;
+  text-decoration: line-through;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .actions {
