@@ -14,10 +14,12 @@ const Home = () => {
     standing: '',
     nextOpponent: '',
     rank: '',
-    numTents: 0,
+    numTents: null,
   });
   const [tentLink, setTentLink] = useState('');
   const [linkActive, setLinkActive] = useState(false);
+  const [inSeason, setInSeason] = useState(null);
+
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/tent-link`)
       .then(res => res.json())
@@ -27,6 +29,17 @@ const Home = () => {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/season-status`)
+      .then((res) => res.json())
+      .then((statusData) => {
+        setInSeason(!!statusData.inSeason);
+      })
+      .catch(() => {
+        setInSeason(true); // fallback if error
+      });
+  }, [API_BASE_URL]);
 
 
   const handleRegisterClick = () => {
@@ -64,22 +77,47 @@ const Home = () => {
     fetchData();
   }, []);
   useEffect(() => {
-    const fetchTentsCount = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const tents = response.data;
-        setData(prevData => ({ ...prevData, numTents: tents.length }));
-      } catch (error) {
+  // Don't do anything until we've actually loaded season status
+  if (inSeason === null) return;
+
+  let cancelled = false;
+
+  const fetchTentsCount = async () => {
+    try {
+      if (!inSeason) {
+        // Off-season: force 0 and skip the API call
+        if (!cancelled) {
+          setData((prevData) => ({ ...prevData, numTents: 0 }));
+        }
+        return;
+      }
+
+      // In-season: fetch real tent count
+      const response = await axios.get(`${API_BASE_URL}/api/tent-checks`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (cancelled) return; // ignore if effect has been cleaned up
+
+      const tents = response.data;
+      setData((prevData) => ({ ...prevData, numTents: tents.length }));
+    } catch (error) {
+      if (!cancelled) {
         console.error('Error fetching tent count:', error);
       }
-    };
+    }
+  };
 
-    fetchTentsCount();
-  }, []);
+  fetchTentsCount();
+
+  return () => {
+    // this will be run before the next effect or on unmount,
+    // so old async calls won't update state
+    cancelled = true;
+  };
+}, [inSeason, API_BASE_URL]);
 
   return (
     <>
@@ -110,7 +148,7 @@ const Home = () => {
                 </div>
                 <div className="stat-box">
                 <div>NUMBER OF TENTS IN K-VILLE</div>
-                <div className='dukeStats'>{data.numTents || "TBD"}</div>
+                <div className='dukeStats'>{data.numTents ?? "TBD"}</div>
                 </div>
             </div>
         </div>

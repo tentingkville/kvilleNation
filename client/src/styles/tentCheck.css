@@ -105,36 +105,34 @@
   margin: 5px 0;
 }
 
-.members-list {
+.tent-check .members-list {
   list-style-type: none;
   padding: 0;
   margin: 0 0 20px 0;
+  display: block;
 }
 
-.members-list li {
+.tent-check .members-list li {
   border: 1px solid #ddd;
-  padding: 10px 15px;
-  margin-bottom: 5px;
+  padding: 12px 15px;
+  margin: 6px 0;
   border-radius: 5px;
   background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
   transition: background-color 0.3s ease, transform 0.2s ease;
   cursor: pointer;
 }
 
-/* .members-list li:hover {
-  background-color: #e0e7f1;
-} */
-
-.members-list li.selected {
+.tent-check .members-list li.selected {
   background-color: #001A57;
   color: white;
   border-color: #001A57;
 }
 
-.excluded {
+.tent-check .members-list li.excluded {
   color: gray;
   text-decoration: line-through;
   pointer-events: none;
@@ -142,6 +140,10 @@
 }
 .duke-card-checker .excluded {
   pointer-events: auto;
+  color: gray;
+  text-decoration: line-through;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .actions {
@@ -385,7 +387,6 @@
     font-size: 16px;
     margin: 7.5px;
   }
-
   .actions button {
     padding: 10px 15px;
     font-size: 15px;
