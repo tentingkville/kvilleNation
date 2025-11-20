@@ -61,7 +61,7 @@
 }
 
 .faqs .header span:first-child {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: #001A57;
   text-decoration: none; 
@@ -82,7 +82,7 @@
 
 .faqs .answer {
   padding: 0px 20px 18px;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.7;
   color: #444;
   background: #ffffff;
@@ -99,6 +99,7 @@
 
 
 .faqs .img-answer-content {
+  padding-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 14px;
