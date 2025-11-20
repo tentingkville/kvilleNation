@@ -44,10 +44,10 @@ function FAQs() {
               </p>
               <p>
                 For most games, WUL registration is open from 7am on game day until two hours before game time.
-                Different rules and start times will apply for "Designated Big Games," which are expected to be 
-                Florida and Louisville for the 2025-2026 season, but will be further communicated by the Head Line
-                Monitors and VPs of Gameday throughout the season. Two hours before the scheduled game start time, 
-                your entire group must be in K-Ville for line up.
+                Different rules and start times will apply for "Designated Big Games." The specific games for the
+                current season can be found in the policy, but will be further communicated by the Head Line Monitors
+                and VPs of Gameday throughout. Two hours before the scheduled game start time, your entire group must
+                be in K-Ville for line up.
               </p>
               <p>
                 <strong>
@@ -78,9 +78,9 @@ function FAQs() {
               </p>               
               <p> 
                 Note that for Black tenting, if more than 80 tents indicate interest, there will be a Duke MBB-related trivia test
-                based on the 2025-2026 season in order to earn a spot in K-Ville. For White tenting, you must earn your spot by participating
+                based on the current season in order to earn a spot in K-Ville. For White tenting, you must earn your spot by participating
                 in a scavenger hunt called Race to the Secret Spots. Further information will be communicated by the Head Line Monitors and 
-                VPs of Tenting later in the season. 
+                VPs of Tenting during the tenting season. 
               </p>
               <p>
                 <strong>
@@ -97,7 +97,7 @@ function FAQs() {
             <div>
               <p>
               The Black Tenting Test (“Entry Test”) will occur if more than 80 tents register for Black tenting
-              within the first 48 hours of tent registration; test content will be based on the 2025-2026 Duke MBB
+              within the first 48 hours of tent registration; test content will be based on the current Duke MBB
               season only. Tents that score within the top 70 will receive a Black tenting spot, and tents scoring
               71-80 will receive a Blue tenting spot in the order of their score.
               </p>
@@ -111,13 +111,36 @@ function FAQs() {
         {
           q: "What does it mean to Dirty Black or Dirty Blue tent?",
           a: (
-            <p> Afraaz working on it </p>
+            <div> 
+              <p>
+              This is only relevant if there is NOT an entry test in a given season. “Dirty Tenting” means that your tent began
+              tenting after the first day of a tenting period (either Black or Blue). For instance, a tent starting in the middle
+              of Black tenting would be classified as a Dirty Black tent.
+              </p>
+              <p>
+              Dirty Black tents starting after the beginning of the Black Tenting period, but before the start of Blue Tenting, will
+              all be ordered on a first-come, first-served basis after Black Tents that started at the beginning. In the event that
+              multiple Dirty Black tents choose to pitch on the same day, the ordering will be determined by the time at which the online
+              form was submitted.
+              </p>
+              <p>
+              Dirty Blue tents starting after the beginning of the Blue Tenting period, but before the start of White Tenting, will all
+              be ordered on a first-come, first-served basis after Blue Tents that started at the beginning. In the event that multiple
+              Dirty Blue Tents choose to pitch on the same day, the ordering will be determined by the time at which the online form was
+              submitted.
+              </p>
+            </div>
           ),
         },
         {
           q: "Can we change who is in our tent after we have registered our tent?",
           a: (
-            <p> Afraaz working on it </p>
+            <p>
+            Each tent will have a five-day period after they begin tenting during which they can change their roster online. 
+            After those five days, any roster changes must be emailed to tenting.kville@gmail.com and be approved by the VPs
+            of Tenting and/or Head Line Monitors. If you are using tenting equipment from the K-Ville Loaner Program, the deadline
+            to switch into or out of a group is designated in the policy.
+            </p>
           ),
         },
         {
@@ -155,7 +178,10 @@ function FAQs() {
         {
           q: "Can I tent for UNC and wait in line for other games at the same time?",
           a: (
-            <p> Afraaz working on it </p>
+            <p>
+            Yes! A group’s position in the line for UNC does not dictate position in line for any other game and vice versa.
+            Additionally, the use of tents for Designated Big Games in no way relates to tenting for the Carolina game.
+            </p>
           ),
         },
         {
@@ -165,13 +191,13 @@ function FAQs() {
               <p>
                 Yes! For financial concerns, the Tenting Loaner Program is available to provide tenters with free equipment such as sleeping bags,
                 lanterns, etc. Need-related assessments will be conducted by Student Involvement and Leadership and details on how to apply 
-                will be sent out in early December. For accessibility accommodations needed for WUL, tenting, accessible seating in
-                Cameron, etc., please reach out to the Head Line Monitors (headlinemonitors@gmail.com) or our representative in the SDAO office (leigh.bhe@duke.edu). 
+                will be sent out near the end of the fall semester. For accessibility accommodations needed for WUL, tenting, accessible seating in
+                Cameron, etc., please reach out to the Head Line Monitors (headlinemonitor@gmail.com) or our representative in the SDAO office (leigh.millar@duke.edu). 
               </p>
               <p>
                 <strong>
                 Contact information can additionally be found on our{" "}
-                <Link to="/contacts">Contact Information</Link> page.
+                <Link to="/contacts">Contact Us</Link> page.
                 </strong>
               </p>
             </div>
@@ -195,7 +221,7 @@ function FAQs() {
           <p className="content">
             For any additional questions not answered here, please refer to our{" "}
             <Link to="/contacts" className="contacts-link">
-              Contact Information
+              Contact Us
             </Link>{" "}
             page to see who to reach out to.
           </p>

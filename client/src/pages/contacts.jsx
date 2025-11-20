@@ -11,7 +11,7 @@ function Contacts() {
 
   return (
     <div className="contacts">
-      <p className="title">Contact Information</p>
+      <p className="title">Contact Us</p>
       {contacts.map((c, index) => (
         <div key={index} className="card">
             <p className="role">{c.role}</p>

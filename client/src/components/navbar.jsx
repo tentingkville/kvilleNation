@@ -107,7 +107,7 @@ export default function Navbar() {
               activeClassName="active"
               onClick={closeMenu}
             >
-              Contact Information
+              Contact Us
             </NavLink>
             {user.isLineMonitor && (
               <NavLink
