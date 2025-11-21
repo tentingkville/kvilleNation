@@ -14,9 +14,11 @@ function Contacts() {
       <p className="title">Contact Us</p>
       {contacts.map((c, index) => (
         <div key={index} className="card">
-            <p className="role">{c.role}</p>
-            <p className="info">{c.info}</p>
-            <p className="email">{c.email}</p>
+          <p className="role">{c.role}</p>
+          <p className="info">{c.info}</p>
+          <p className="email">
+            <a href={`mailto:${c.email}`}>{c.email}</a>
+          </p>
         </div>
       ))}
     </div>
