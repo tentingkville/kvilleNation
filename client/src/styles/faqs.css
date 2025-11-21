@@ -81,11 +81,26 @@
 
 
 .faqs .answer {
-  padding: 0px 20px 18px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding: 0 20px;            
   font-size: 16px;
   line-height: 1.7;
   color: #444;
   background: #ffffff;
+  border-top: none;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.25s ease,
+    padding-top 0.25s ease,
+    padding-bottom 0.25s ease,
+    border-top 0.25s ease;
+}
+.faqs .answer.open {
+  max-height: 1000px;        
+  opacity: 1;
+  padding: 12px 20px 18px;    
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 

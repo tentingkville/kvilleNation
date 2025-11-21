@@ -239,9 +239,11 @@ function FAQs() {
                   {openIndexes.includes(index) ? "▲" : "▼"}
                 </span>
               </div>
-              {openIndexes.includes(index) && (
-                <div className="answer">{item.a}</div>
-              )}
+              <div
+                className={`answer ${openIndexes.includes(index) ? "open" : ""}`}
+              >
+                {item.a}
+              </div>
             </div>
           ))}
         </div>
