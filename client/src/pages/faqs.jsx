@@ -136,7 +136,7 @@ function FAQs() {
           q: "Can we change who is in our tent after we have registered our tent?",
           a: (
             <p>
-            Each tent will have a five-day period after they begin tenting during which they can change their roster online. 
+            Each tent will have a five-day period after they begin tenting during which they can change their roster. 
             After those five days, any roster changes must be emailed to tenting.kville@gmail.com and be approved by the VPs
             of Tenting and/or Head Line Monitors. If you are using tenting equipment from the K-Ville Loaner Program, the deadline
             to switch into or out of a group is designated in the policy.
