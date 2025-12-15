@@ -1,53 +1,165 @@
-// server/routes/fileRoutes.js
-const path = require('path');
-const fs = require('fs');
 const express = require('express');
 const multer = require('multer');
+const mongoose = require('mongoose');
+const streamifier = require('streamifier');
 
 const router = express.Router();
 
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024 },
+});
 
-function makeStorage(basename) {
-  return multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-    filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname) || '.pdf';
-      cb(null, `${basename}${ext}`);
-    },
-  });
+// Use a dedicated bucket name (creates collections: uploads.files + uploads.chunks)
+function getBucket() {
+  const db = mongoose.connection.db;
+  if (!db) throw new Error('MongoDB not connected yet.');
+  return new mongoose.mongo.GridFSBucket(db, { bucketName: 'uploads' });
 }
 
-const uploadPolicy   = multer({ storage: makeStorage('policy'),   limits: { fileSize: 15 * 1024 * 1024 } });
-const uploadCalendar = multer({ storage: makeStorage('calendar'), limits: { fileSize: 15 * 1024 * 1024 } });
+async function findLatestByKind(kind) {
+  const db = mongoose.connection.db;
+  const files = await db
+    .collection('uploads.files')
+    .find({ 'metadata.kind': kind })
+    .sort({ uploadDate: -1 })
+    .limit(1)
+    .toArray();
+  return files[0] || null;
+}
 
-// ---- POLICY ----
-router.get('/policy', (_req, res) => {
-  const files = fs.readdirSync(UPLOAD_DIR);
-  const name = files.find(f => f.startsWith('policy.'));
-  if (!name) return res.json({ url: null, updatedAt: null });
-  const stat = fs.statSync(path.join(UPLOAD_DIR, name));
-  return res.json({ url: `/uploads/${name}`, updatedAt: stat.mtime });
+async function deleteAllByKind(kind) {
+  const db = mongoose.connection.db;
+  const bucket = getBucket();
+
+  const files = await db.collection('uploads.files').find({ 'metadata.kind': kind }).toArray();
+  // Delete each file (also removes its chunks)
+  await Promise.all(files.map((f) => bucket.delete(f._id).catch(() => {})));
+}
+
+async function uploadNew(kind, file) {
+  const bucket = getBucket();
+
+  // Keep a stable name in Mongo (helpful for debugging)
+  const filename = `${kind}.pdf`;
+
+  // Upload stream into GridFS
+  const uploadStream = bucket.openUploadStream(filename, {
+    contentType: file.mimetype || 'application/pdf',
+    metadata: {
+      kind, // "policy" or "calendar"
+      originalName: file.originalname,
+    },
+  });
+
+  await new Promise((resolve, reject) => {
+    streamifier
+      .createReadStream(file.buffer)
+      .pipe(uploadStream)
+      .on('error', reject)
+      .on('finish', resolve);
+  });
+
+  return uploadStream.id;
+}
+
+// ------------------- POLICY META -------------------
+router.get('/policy', async (_req, res) => {
+  try {
+    const latest = await findLatestByKind('policy');
+    if (!latest) return res.json({ url: null, updatedAt: null });
+
+    // Cache-bust using uploadDate timestamp
+    const v = new Date(latest.uploadDate).getTime();
+
+    return res.json({
+      url: `/api/files/policy/download?v=${v}`,
+      updatedAt: latest.uploadDate,
+    });
+  } catch (e) {
+    return res.status(500).json({ error: e.message || 'Failed to fetch policy metadata' });
+  }
 });
 
-router.post('/policy', uploadPolicy.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-  return res.json({ url: `/uploads/${req.file.filename}`, size: req.file.size, mimetype: req.file.mimetype });
+// ------------------- POLICY DOWNLOAD -------------------
+router.get('/policy/download', async (_req, res) => {
+  try {
+    const latest = await findLatestByKind('policy');
+    if (!latest) return res.status(404).send('No policy file');
+
+    res.setHeader('Content-Type', latest.contentType || 'application/pdf');
+    res.setHeader('Cache-Control', 'no-store');
+    // inline = open in browser; attachment = force download
+    res.setHeader('Content-Disposition', 'inline; filename="policy.pdf"');
+
+    const bucket = getBucket();
+    bucket.openDownloadStream(latest._id).pipe(res);
+  } catch (e) {
+    return res.status(500).send(e.message || 'Failed to download policy');
+  }
 });
 
-// ---- CALENDAR ----
-router.get('/calendar', (_req, res) => {
-  const files = fs.readdirSync(UPLOAD_DIR);
-  const name = files.find(f => f.startsWith('calendar.'));
-  if (!name) return res.json({ url: null, updatedAt: null });
-  const stat = fs.statSync(path.join(UPLOAD_DIR, name));
-  return res.json({ url: `/uploads/${name}`, updatedAt: stat.mtime });
+// ------------------- POLICY UPLOAD -------------------
+router.post('/policy', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    // Replace the current policy
+    await deleteAllByKind('policy');
+    await uploadNew('policy', req.file);
+
+    return res.json({ ok: true, message: 'Policy uploaded' });
+  } catch (e) {
+    return res.status(500).json({ error: e.message || 'Upload failed' });
+  }
 });
 
-router.post('/calendar', uploadCalendar.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-  return res.json({ url: `/uploads/${req.file.filename}`, size: req.file.size, mimetype: req.file.mimetype });
+// ------------------- CALENDAR META -------------------
+router.get('/calendar', async (_req, res) => {
+  try {
+    const latest = await findLatestByKind('calendar');
+    if (!latest) return res.json({ url: null, updatedAt: null });
+
+    const v = new Date(latest.uploadDate).getTime();
+
+    return res.json({
+      url: `/api/files/calendar/download?v=${v}`,
+      updatedAt: latest.uploadDate,
+    });
+  } catch (e) {
+    return res.status(500).json({ error: e.message || 'Failed to fetch calendar metadata' });
+  }
+});
+
+// ------------------- CALENDAR DOWNLOAD -------------------
+router.get('/calendar/download', async (_req, res) => {
+  try {
+    const latest = await findLatestByKind('calendar');
+    if (!latest) return res.status(404).send('No calendar file');
+
+    res.setHeader('Content-Type', latest.contentType || 'application/pdf');
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Content-Disposition', 'inline; filename="calendar.pdf"');
+
+    const bucket = getBucket();
+    bucket.openDownloadStream(latest._id).pipe(res);
+  } catch (e) {
+    return res.status(500).send(e.message || 'Failed to download calendar');
+  }
+});
+
+// ------------------- CALENDAR UPLOAD -------------------
+router.post('/calendar', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    await deleteAllByKind('calendar');
+    await uploadNew('calendar', req.file);
+
+    return res.json({ ok: true, message: 'Calendar uploaded' });
+  } catch (e) {
+    return res.status(500).json({ error: e.message || 'Upload failed' });
+  }
 });
 
 module.exports = router;
