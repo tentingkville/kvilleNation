@@ -33,7 +33,7 @@ router.put('/', async (req, res) => {
     const saved = await AirtableConfig.findByIdAndUpdate(
       'airtable',
       { $set: update },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
+      { new: true, upsert: true, setDefaultsOnInsert: true, runValidators: true }
     ).lean();
 
     invalidateAirtableCache();
