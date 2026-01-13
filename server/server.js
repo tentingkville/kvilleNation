@@ -30,7 +30,7 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://kville-nation-frontend.vercel.app',
+  'https://kville-nation.vercel.app',
   'https://kvillenation.com',
   'https://www.kvillenation.com',
 ];
